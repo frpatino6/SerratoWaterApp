@@ -1,0 +1,131 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:serrato_water_app/api/fireBaseApi.dart';
+import 'package:serrato_water_app/bloc/auth/auth_bloc.dart';
+import 'package:serrato_water_app/bloc/auth/auth_event.dart';
+import 'package:serrato_water_app/bloc/auth/auth_state.dart';
+import 'package:serrato_water_app/screens/data_capture_screen.dart';
+
+// Asegúrate de importar los archivos necesarios.
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Login Professional',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: BlocProvider(
+        create: (context) => AuthBloc(api: FirebaseAPI()),
+        child: AuthScreen(),
+      ),
+    );
+  }
+}
+
+class AuthScreen extends StatefulWidget {
+  @override
+  _AuthScreenState createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.error)),
+            );
+          } else if (state is AuthSuccess) {
+            Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const DataCaptureScreen()));
+          }
+        },
+        builder: (context, state) {
+          return Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Image.asset(
+                      "assets/images/logo.png", // Suponiendo que tienes un logo en tus assets.
+                      height: 180,
+                      width: 280,
+                    ),
+                    const SizedBox(height: 50),
+                    TextField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        hintText: 'Email',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        hintText: 'Password',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    if (state is AuthLoading) ...[
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 20),
+                    ],
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<AuthBloc>().add(LoginEvent(
+                            _emailController.text, _passwordController.text));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 20),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: const Text('Login'),
+                    ),
+                    const SizedBox(height: 20),
+                    TextButton(
+                      onPressed: () {
+                        context.read<AuthBloc>().add(RegisterEvent(
+                            _emailController.text, _passwordController.text));
+                      },
+                      child: const Text('Register'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

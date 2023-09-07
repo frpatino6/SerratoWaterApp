@@ -1,0 +1,27 @@
+name: serrato_water_app
+description: A new Flutter project.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.1.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^7.0.0
+  http: ^0.13.3
+  equatable: ^2.0.0
+  flutter_signature_pad: ^3.0.1
+  file_picker: ^5.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/logo.png    
+
