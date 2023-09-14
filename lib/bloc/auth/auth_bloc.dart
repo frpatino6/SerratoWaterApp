@@ -23,12 +23,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     } else if (event is RegisterEvent) {
       try {
-        final result = await api.signUp(event.email, event.password);
+        final result = await api.signUp(
+            event.email, event.password, event.firstName, event.lastName);
         if (result.containsKey('error')) {
           yield AuthFailure(result['error']['message']);
         } else {
           yield AuthSuccess();
         }
+      } catch (error) {
+        yield AuthFailure(error.toString());
+      }
+    } else if (event is LoadUserListEvent) {
+      try {
+        final List<String> userList =
+            await api.loadUserListFromDatabase(event.selectedUserType);
+        yield UserListLoadedState(userList);
       } catch (error) {
         yield AuthFailure(error.toString());
       }

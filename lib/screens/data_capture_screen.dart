@@ -3,9 +3,12 @@ import 'dart:ui' as ui;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:serrato_water_app/bloc/credit_application/credit_application_bloc.dart';
 import 'package:serrato_water_app/bloc/credit_application/credit_application_event.dart';
 import 'package:serrato_water_app/bloc/credit_application/credit_application_state.dart';
+import 'package:serrato_water_app/providers/user_provider.dart';
+import 'package:serrato_water_app/screens/auth_screen.dart';
 import 'package:serrato_water_app/screens/mis_transacciones_screen.dart';
 import 'package:flutter_signature_pad/flutter_signature_pad.dart';
 
@@ -51,18 +54,51 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   late final String price;
   late final String watermark;
 
-  final TextEditingController _dateOfBirthController = TextEditingController();
-  final TextEditingController _idIssueDateController = TextEditingController();
-  final TextEditingController _creditCardExpirationDateController =
+  TextEditingController _saleAmountController = TextEditingController();
+  TextEditingController _hardnessController = TextEditingController();
+  TextEditingController _salesRepresentativeController =
       TextEditingController();
-  final TextEditingController _expirationDateController =
+  TextEditingController _productsSoldController = TextEditingController();
+  TextEditingController _applicantFirstNameController = TextEditingController();
+  TextEditingController _applicantLastNameController = TextEditingController();
+  TextEditingController _phoneNumberController = TextEditingController();
+  TextEditingController _dateOfBirthController = TextEditingController();
+  TextEditingController _idIssueDateController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _socialSecurityNumberController =
       TextEditingController();
+  TextEditingController _idNumberDriverLicenseController =
+      TextEditingController();
+  TextEditingController _addressController = TextEditingController();
+  TextEditingController _stateController = TextEditingController();
+  TextEditingController _cityZipCodeController = TextEditingController();
+  TextEditingController _installationAddressDifferentController =
+      TextEditingController();
+  TextEditingController _expirationDateController = TextEditingController();
+  TextEditingController _monthlyMortgagePaymentController =
+      TextEditingController();
+  TextEditingController _employerNameController = TextEditingController();
+  TextEditingController _employerPhoneNumberController =
+      TextEditingController();
+  TextEditingController _occupationController = TextEditingController();
+  TextEditingController _timeAtCurrentJobController = TextEditingController();
+  TextEditingController _employmentMonthlyIncomeController =
+      TextEditingController();
+  TextEditingController _otherIncomeController = TextEditingController();
+  TextEditingController _sourceOfOtherIncomeController =
+      TextEditingController();
+  TextEditingController _forIDPurposesController = TextEditingController();
+  TextEditingController _creditCardExpirationDateController =
+      TextEditingController();
+  TextEditingController _userController = TextEditingController();
+  TextEditingController _timeAtResidenceController = TextEditingController();
 
   String _saleAmount = '';
   String _hardness = '';
   String _salesRepresentative = '';
   String _productsSold = '';
-  String _applicantName = '';
+  String _applicantFirstName = '';
+  String _applicantLastName = '';
   DateTime _dateOfBirth = DateTime.now();
   String _phoneNumber = '';
   String _email = '';
@@ -88,6 +124,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   bool _isACHInfoAdded = false;
   bool _isIncomeNoticeChecked = false;
   bool _isCoApplicantAdded = false;
+  String _user = "";
   FilePickerResult? _file;
   final List<String> _products = [
     "",
@@ -160,9 +197,18 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _user = Provider.of<UserProvider>(context).username;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Credit Application'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const AuthScreen()),
+            );
+          },
+        ),
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(20.0),
           child: Padding(
@@ -193,6 +239,12 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
               }
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              _clearFormFields();
+            },
+          ),
         ],
       ),
       body: BlocConsumer<CreditApplicationBloc, CreditApplicationState>(
@@ -202,9 +254,25 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
               SnackBar(content: Text(state.error)),
             );
           } else if (state is CreditApplicationSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Application saved successfully!')),
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Ok'),
+                  content:
+                      const Text('The application has been successfully saved'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                );
+              },
             );
+            _clearFormFields();
           }
         },
         builder: (context, state) {
@@ -215,25 +283,37 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
               child: ListView(
                 children: <Widget>[
                   TextFormField(
+                    controller: _saleAmountController,
                     decoration:
                         const InputDecoration(labelText: 'Sale Amount (\$)'),
                     keyboardType:
                         const TextInputType.numberWithOptions(decimal: true),
                     onSaved: (value) => _saleAmount = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isCurrency: true, min: 0.01),
                   ),
                   TextFormField(
                     decoration: const InputDecoration(labelText: 'Hardness'),
+                    controller: _hardnessController,
                     onSaved: (value) => _hardness = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
                   ),
                   TextFormField(
+                    controller: _salesRepresentativeController,
                     decoration: const InputDecoration(
                         labelText: 'Sales Representative'),
                     onSaved: (value) => _salesRepresentative = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
+                    // add validator
                   ),
                   DropdownButtonFormField<String>(
                     decoration:
                         const InputDecoration(labelText: 'Products Sold'),
                     value: _selectedProduct,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
                     items: _products.map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -250,12 +330,28 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     },
                   ),
                   TextFormField(
+                    controller: _applicantFirstNameController,
                     decoration:
-                        const InputDecoration(labelText: 'Applicant Name'),
-                    onSaved: (value) => _applicantName = value!,
+                        const InputDecoration(labelText: 'Applicant Firt Name'),
+                    onSaved: (value) => _applicantFirstName = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
+                  ),
+                  TextFormField(
+                    controller: _applicantLastNameController,
+                    decoration:
+                        const InputDecoration(labelText: 'Applicant Last Name'),
+                    onSaved: (value) => _applicantLastName = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: false, isNumeric: false),
                   ),
                   TextFormField(
                     controller: _dateOfBirthController,
+                    validator: (value) => customValidator(value,
+                        isRequired: true,
+                        isDate: true,
+                        minDate: DateTime(1900),
+                        maxDate: DateTime.now()),
                     decoration:
                         const InputDecoration(labelText: 'Date of Birth'),
                     onTap: () async {
@@ -274,13 +370,17 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     },
                   ),
                   TextFormField(
+                    controller: _phoneNumberController,
                     decoration: const InputDecoration(
                         labelText: 'Phone Number (US Format)',
                         prefixText: '+1 '),
                     keyboardType: TextInputType.phone,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
                     onSaved: (value) => _phoneNumber = value!,
                   ),
                   TextFormField(
+                    controller: _emailController,
                     decoration: const InputDecoration(labelText: 'Email'),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
@@ -294,17 +394,28 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     onSaved: (value) => _email = value!,
                   ),
                   TextFormField(
+                    controller: _socialSecurityNumberController,
                     decoration: const InputDecoration(
                         labelText: 'Social Security Number'),
                     onSaved: (value) => _socialSecurityNumber = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: true),
                   ),
                   TextFormField(
+                    controller: _idNumberDriverLicenseController,
                     decoration: const InputDecoration(
                         labelText: 'ID Number (Driver License)'),
                     onSaved: (value) => _idNumberDriverLicense = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
                   ),
                   TextFormField(
                     controller: _idIssueDateController,
+                    validator: (value) => customValidator(value,
+                        isRequired: true,
+                        isDate: true,
+                        minDate: DateTime(1900),
+                        maxDate: DateTime.now()),
                     decoration:
                         const InputDecoration(labelText: 'ID Issue Date'),
                     onTap: () async {
@@ -324,6 +435,11 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                   ),
                   TextFormField(
                     controller: _expirationDateController,
+                    validator: (value) => customValidator(value,
+                        isRequired: true,
+                        isDate: true,
+                        minDate: DateTime(1900),
+                        maxDate: DateTime.now()),
                     decoration:
                         const InputDecoration(labelText: 'Expiration Date'),
                     onTap: () async {
@@ -342,19 +458,25 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     },
                   ),
                   TextFormField(
+                    controller: _timeAtResidenceController,
                     decoration: const InputDecoration(
                         labelText: 'Time at Residence (in months)'),
                     keyboardType: TextInputType.number,
                     onSaved: (value) => _timeAtResidence = int.parse(value!),
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
                   ),
                   TextFormField(
+                    controller: _addressController,
                     decoration: const InputDecoration(labelText: 'Address'),
                     onSaved: (value) => _address = value!,
                   ),
                   DropdownButtonFormField(
                     decoration: const InputDecoration(labelText: 'State'),
+                    value:
+                        _state.isEmpty ? null : _state, // Asigna el valor aquí
                     items: _statesList.map((String value) {
-                      return new DropdownMenuItem<String>(
+                      return DropdownMenuItem<String>(
                         value: value,
                         child: new Text(value),
                       );
@@ -367,11 +489,15 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     onSaved: (value) => _state = value!,
                   ),
                   TextFormField(
+                    controller: _cityZipCodeController,
                     decoration:
                         const InputDecoration(labelText: 'City (Zip Code)'),
                     onSaved: (value) => _cityZipCode = value!,
                   ),
                   DropdownButtonFormField(
+                    value: _state.isEmpty
+                        ? null
+                        : _installationAddressDifferent, // Asigna el valor aquí
                     decoration: const InputDecoration(
                         labelText: 'Is the installation address different?'),
                     items: <String>['Yes', 'No']
@@ -389,60 +515,89 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     onSaved: (value) => _installationAddressDifferent = value!,
                   ),
                   TextFormField(
+                    controller: _monthlyMortgagePaymentController,
                     decoration: const InputDecoration(
                         labelText: 'Monthly Mortgage Payment (\$)'),
                     keyboardType:
                         const TextInputType.numberWithOptions(decimal: true),
                     onSaved: (value) => _monthlyMortgagePayment = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isCurrency: true, min: 0.01),
                   ),
                   TextFormField(
+                    controller: _employerNameController,
                     decoration:
                         const InputDecoration(labelText: 'Employer Name'),
                     onSaved: (value) => _employerName = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
                   ),
                   TextFormField(
+                    controller: _employerPhoneNumberController,
                     decoration: const InputDecoration(
                         labelText: 'Employer Phone Number', prefixText: '+1 '),
                     keyboardType: TextInputType.phone,
                     onSaved: (value) => _employerPhoneNumber = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
                   ),
                   TextFormField(
+                    controller: _occupationController,
                     decoration: const InputDecoration(labelText: 'Occupation'),
                     onSaved: (value) => _occupation = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
                   ),
                   TextFormField(
+                    controller: _timeAtCurrentJobController,
                     decoration:
                         const InputDecoration(labelText: 'Time at Current Job'),
                     onSaved: (value) => _timeAtCurrentJob = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
                   ),
                   TextFormField(
+                    controller: _employmentMonthlyIncomeController,
                     decoration: const InputDecoration(
                         labelText: 'Employment Monthly Income (\$)'),
                     keyboardType:
                         const TextInputType.numberWithOptions(decimal: true),
                     onSaved: (value) => _employmentMonthlyIncome = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isCurrency: true, min: 0.01),
                   ),
                   TextFormField(
+                    controller: _otherIncomeController,
                     decoration:
                         const InputDecoration(labelText: 'Other Income (\$)'),
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isCurrency: true, min: 0.01),
                     keyboardType:
                         const TextInputType.numberWithOptions(decimal: true),
                     onSaved: (value) => _otherIncome = value!,
                   ),
                   TextFormField(
+                    controller: _sourceOfOtherIncomeController,
                     decoration: const InputDecoration(
                         labelText: 'Source of Other Income'),
                     onSaved: (value) => _sourceOfOtherIncome = value!,
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
                   ),
                   DropdownButtonFormField(
+                    value: _state.isEmpty
+                        ? null
+                        : _forIDPurposes, // Asigna el valor aquí
                     decoration:
                         const InputDecoration(labelText: 'For ID purposes'),
                     items: _idPurposesList.map((String value) {
-                      return new DropdownMenuItem<String>(
+                      return DropdownMenuItem<String>(
                         value: value,
-                        child: new Text(value),
+                        child: Text(value),
                       );
                     }).toList(),
+                    validator: (value) => customValidator(value,
+                        isRequired: true, isNumeric: false),
                     onChanged: (newValue) {
                       setState(() {
                         _forIDPurposes = newValue.toString();
@@ -468,7 +623,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                   ListTile(
                     title: const Text('Add ACH Info?'),
                     trailing: ToggleButtons(
-                      children: [const Text('Yes'), const Text('No')],
+                      children: const [Text('Yes'), Text('No')],
                       isSelected: [_isACHInfoAdded, !_isACHInfoAdded],
                       onPressed: (int index) {
                         setState(() {
@@ -548,7 +703,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         "hardness": _hardness,
         "salesRepresentative": _salesRepresentative,
         "productsSold": _productsSold,
-        "applicantName": _applicantName,
+        "applicantName": _applicantFirstName,
         "dateOfBirth": _dateOfBirth.toIso8601String(),
         "phoneNumber": _phoneNumber,
         "email": _email,
@@ -575,6 +730,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         "isIncomeNoticeChecked": _isIncomeNoticeChecked,
         "isCoApplicantAdded": _isCoApplicantAdded,
         "selectedProduct": _selectedProduct,
+        "userOwner": _user,
       };
 
       BlocProvider.of<CreditApplicationBloc>(context)
@@ -583,10 +739,88 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   }
 
   void _handleMenuSelection(String choice) {
-    if (choice == 'Mis Transacciones') {
+    if (choice == 'My transactions') {
       // Aquí puedes navegar a la pantalla de "Mis Transacciones" o realizar cualquier otra acción que necesites.
-      Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const MisTransaccionesScreen()));
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => MisTransaccionesScreen()));
     }
+  }
+
+  String? customValidator(String? value,
+      {bool isRequired = true,
+      bool isNumeric = false,
+      bool isDate = false,
+      DateTime? minDate,
+      DateTime? maxDate,
+      bool isCurrency = false,
+      double? min,
+      double? max}) {
+    if (isRequired && (value == null || value.isEmpty)) {
+      return 'This field is required';
+    }
+
+    if (isNumeric && double.tryParse(value ?? '') == null) {
+      return 'Please enter a valid number';
+    }
+
+    if (isDate) {
+      DateTime? date = DateTime.tryParse(value ?? '');
+      if (date == null) {
+        return 'Please enter a valid date';
+      } else if (minDate != null && date.isBefore(minDate)) {
+        return 'The date cannot be earlier than ${minDate.toLocal().toString().split(' ')[0]}';
+      } else if (maxDate != null && date.isAfter(maxDate)) {
+        return 'The date cannot be later than ${maxDate.toLocal().toString().split(' ')[0]}';
+      }
+    }
+    if (isCurrency) {
+      double? amount = double.tryParse(value ?? '');
+      if (amount == null) {
+        return 'Please enter a valid amount';
+      } else if (min != null && amount < min) {
+        return 'The amount cannot be less than \$${min.toString()}';
+      } else if (max != null && amount > max) {
+        return 'The amount cannot be more than \$${max.toString()}';
+      }
+    }
+    return null;
+  }
+
+  void _clearFormFields() {
+    _saleAmountController.clear();
+    _hardnessController.clear();
+    _salesRepresentativeController.clear();
+    _productsSoldController.clear();
+    _applicantFirstNameController.clear();
+    _applicantLastNameController.clear();
+    _phoneNumberController.clear();
+    _emailController.clear();
+    _socialSecurityNumberController.clear();
+    _idNumberDriverLicenseController.clear();
+    _addressController.clear();
+    _stateController.clear();
+    _cityZipCodeController.clear();
+    _installationAddressDifferentController.clear();
+    _monthlyMortgagePaymentController.clear();
+    _employerNameController.clear();
+    _employerPhoneNumberController.clear();
+    _occupationController.clear();
+    _timeAtCurrentJobController.clear();
+    _employmentMonthlyIncomeController.clear();
+    _otherIncomeController.clear();
+    _sourceOfOtherIncomeController.clear();
+    _forIDPurposesController.clear();
+    _creditCardExpirationDateController.clear();
+    _userController.clear();
+
+    setState(() {
+      _dateOfBirth = DateTime.now();
+      _idIssueDate = DateTime.now();
+      _expirationDate = DateTime.now();
+      _timeAtResidence = 0;
+      _isACHInfoAdded = false;
+      _isIncomeNoticeChecked = false;
+      _isCoApplicantAdded = false;
+    });
   }
 }
