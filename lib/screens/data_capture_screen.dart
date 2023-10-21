@@ -1,8 +1,11 @@
+// ignore_for_file: unused_field
+
 import 'dart:ui' as ui;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:serrato_water_app/bloc/credit_application/credit_application_bloc.dart';
 import 'package:serrato_water_app/bloc/credit_application/credit_application_event.dart';
@@ -11,6 +14,10 @@ import 'package:serrato_water_app/providers/user_provider.dart';
 import 'package:serrato_water_app/screens/auth_screen.dart';
 import 'package:serrato_water_app/screens/mis_transacciones_screen.dart';
 import 'package:flutter_signature_pad/flutter_signature_pad.dart';
+import 'package:serrato_water_app/widgets/addres_information.dart';
+import 'package:serrato_water_app/widgets/address_dialog.dart';
+import 'package:serrato_water_app/widgets/co_application_dialog.dart';
+import 'package:serrato_water_app/widgets/personal_information.dart';
 
 class DataCaptureScreen extends StatefulWidget {
   const DataCaptureScreen({super.key});
@@ -50,53 +57,60 @@ class _WatermarkPaint extends CustomPainter {
 
 class _DataCaptureScreenState extends State<DataCaptureScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _coApplicantFormKey = GlobalKey<FormState>();
   final _sign = GlobalKey<SignatureState>();
   late final String price;
   late final String watermark;
 
-  TextEditingController _saleAmountController = TextEditingController();
-  TextEditingController _hardnessController = TextEditingController();
-  TextEditingController _salesRepresentativeController =
+  final TextEditingController _saleAmountController = TextEditingController();
+
+  final TextEditingController _productsSoldController = TextEditingController();
+  final TextEditingController _applicantFirstNameController =
       TextEditingController();
-  TextEditingController _productsSoldController = TextEditingController();
-  TextEditingController _applicantFirstNameController = TextEditingController();
-  TextEditingController _applicantLastNameController = TextEditingController();
-  TextEditingController _phoneNumberController = TextEditingController();
-  TextEditingController _dateOfBirthController = TextEditingController();
-  TextEditingController _idIssueDateController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _socialSecurityNumberController =
+  final TextEditingController _applicantLastNameController =
       TextEditingController();
-  TextEditingController _idNumberDriverLicenseController =
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _dateOfBirthController = TextEditingController();
+  final TextEditingController _idIssueDateController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _socialSecurityNumberController =
       TextEditingController();
-  TextEditingController _addressController = TextEditingController();
-  TextEditingController _stateController = TextEditingController();
-  TextEditingController _cityZipCodeController = TextEditingController();
-  TextEditingController _installationAddressDifferentController =
+  final TextEditingController _idNumberDriverLicenseController =
       TextEditingController();
-  TextEditingController _expirationDateController = TextEditingController();
-  TextEditingController _monthlyMortgagePaymentController =
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _stateController = TextEditingController();
+  final TextEditingController _cityZipCodeController = TextEditingController();
+  final TextEditingController _installationAddressDifferentController =
       TextEditingController();
-  TextEditingController _employerNameController = TextEditingController();
-  TextEditingController _employerPhoneNumberController =
+  final TextEditingController _expirationDateController =
       TextEditingController();
-  TextEditingController _occupationController = TextEditingController();
-  TextEditingController _timeAtCurrentJobController = TextEditingController();
-  TextEditingController _employmentMonthlyIncomeController =
+
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _monthlyMortgagePaymentController =
       TextEditingController();
-  TextEditingController _otherIncomeController = TextEditingController();
-  TextEditingController _sourceOfOtherIncomeController =
+  final TextEditingController _employerNameController = TextEditingController();
+  final TextEditingController _employerPhoneNumberController =
       TextEditingController();
-  TextEditingController _forIDPurposesController = TextEditingController();
-  TextEditingController _creditCardExpirationDateController =
+  final TextEditingController _occupationController = TextEditingController();
+  final TextEditingController _timeAtCurrentJobController =
       TextEditingController();
-  TextEditingController _userController = TextEditingController();
-  TextEditingController _timeAtResidenceController = TextEditingController();
+  final TextEditingController _employmentMonthlyIncomeController =
+      TextEditingController();
+  final TextEditingController _otherIncomeController = TextEditingController();
+  final TextEditingController _sourceOfOtherIncomeController =
+      TextEditingController();
+  final TextEditingController _forIDPurposesController =
+      TextEditingController();
+  final TextEditingController _creditCardExpirationDateController =
+      TextEditingController();
+  final TextEditingController _userController = TextEditingController();
+  final TextEditingController _timeAtResidenceController =
+      TextEditingController();
 
   String _saleAmount = '';
-  String _hardness = '';
-  String _salesRepresentative = '';
-  String _productsSold = '';
+  final String _hardness = '';
+  final String _salesRepresentative = '';
+  final String _productsSold = '';
   String _applicantFirstName = '';
   String _applicantLastName = '';
   DateTime _dateOfBirth = DateTime.now();
@@ -119,21 +133,48 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   String _employmentMonthlyIncome = '';
   String _otherIncome = '';
   String _sourceOfOtherIncome = '';
-  String _forIDPurposes = 'VISA';
+  String _forIDPurposes = '';
   String _creditCardExpirationDate = '';
   bool _isACHInfoAdded = false;
   bool _isIncomeNoticeChecked = false;
   bool _isCoApplicantAdded = false;
+  String _installationAddress = '';
+  String _installationCity = '';
+  String _installationState = '';
   String _user = "";
+  String _installationZipCode = '';
+  String _coApplicantName = '';
+  String _coApplicantDOB = '';
+  String _coApplicantPhoneNumber = '';
+  String _coApplicantEmail = '';
+  String _coApplicantSSN = '';
+  String _coApplicantIDNumber = '';
+  String _coApplicantexpirationDate = '';
+  String _coApplicantresidenceDuration = '';
+  String _coApplicantaddress = '';
+  String _coApplicantcity = '';
+  String _coApplicantstate = '';
+  String _coApplicantzipCode = '';
+  String _coApplicantmortgagePayment = '';
+  String _coApplicantemployerName = '';
+  String _coApplicantemployerPhoneNumber = '';
+  String _coApplicantoccupation = '';
+  String _coApplicantjobDuration = '';
+  String _coApplicantmonthlyIncome = '';
+  String _coApplicantotherIncome = '';
+  String _coApplicantotherIncomeSource = '';
+  String _coApplicantidPurpose = '';
+  String _coApplicantcreditCardExpiration = '';
+  String _city = '';
   FilePickerResult? _file;
   final List<String> _products = [
-    "",
     "Hydronex 30C",
     "Well Water System",
     "MM7000",
     "Alkaline Stage",
     "5 Years soaps"
   ];
+  List<String?> _selectedProducts = [];
   String? _selectedProduct;
   final List<String> _statesList = [
     "Alabama",
@@ -187,6 +228,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
     "Wisconsin",
     "Wyoming"
   ];
+  bool _isChequed = false;
 
   final List<String> _idPurposesList = [
     "VISA",
@@ -292,114 +334,88 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     validator: (value) => customValidator(value,
                         isRequired: true, isCurrency: true, min: 0.01),
                   ),
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: 'Hardness'),
-                    controller: _hardnessController,
-                    onSaved: (value) => _hardness = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                  ),
-                  TextFormField(
-                    controller: _salesRepresentativeController,
-                    decoration: const InputDecoration(
-                        labelText: 'Sales Representative'),
-                    onSaved: (value) => _salesRepresentative = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                    // add validator
-                  ),
-                  DropdownButtonFormField<String>(
-                    decoration:
-                        const InputDecoration(labelText: 'Products Sold'),
-                    value: _selectedProduct,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                    items: _products.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
+                  MultiSelectBottomSheetField<String?>(
+                    initialChildSize: 0.4,
+                    maxChildSize: 1.0,
+                    listType: MultiSelectListType.LIST,
+                    searchable: true,
+                    buttonText: const Text('Select Products'),
+                    title: const Text('Products'),
+                    items: _products
+                        .map((product) =>
+                            MultiSelectItem<String?>(product, product))
+                        .toList(),
+                    onConfirm: (List<String?> values) {
                       setState(() {
-                        _selectedProduct = newValue;
+                        _selectedProducts =
+                            values.map((String? value) => value!).toList();
                       });
                     },
-                    onSaved: (value) {
-                      _selectedProduct = value;
-                    },
+                    chipDisplay: MultiSelectChipDisplay(
+                      onTap: (value) {
+                        setState(() {
+                          _selectedProducts.remove(value);
+                        });
+                      },
+                    ),
                   ),
-                  TextFormField(
-                    controller: _applicantFirstNameController,
-                    decoration:
-                        const InputDecoration(labelText: 'Applicant Firt Name'),
-                    onSaved: (value) => _applicantFirstName = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                  ),
-                  TextFormField(
-                    controller: _applicantLastNameController,
-                    decoration:
-                        const InputDecoration(labelText: 'Applicant Last Name'),
-                    onSaved: (value) => _applicantLastName = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: false, isNumeric: false),
-                  ),
-                  TextFormField(
-                    controller: _dateOfBirthController,
-                    validator: (value) => customValidator(value,
-                        isRequired: true,
-                        isDate: true,
-                        minDate: DateTime(1900),
-                        maxDate: DateTime.now()),
-                    decoration:
-                        const InputDecoration(labelText: 'Date of Birth'),
-                    onTap: () async {
-                      DateTime date = DateTime(1900);
-                      FocusScope.of(context).requestFocus(new FocusNode());
+                  // add ElevationButtom
+                  ElevatedButton(
+                    onPressed: () async {
+                      final result = await showDialog<Map<String, dynamic>>(
+                        context: context,
+                        builder: (BuildContext context) =>
+                            const PersonalInformationDialog(),
+                      );
 
-                      date = (await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(1900),
-                              lastDate: DateTime.now())) ??
-                          DateTime.now();
-                      _dateOfBirth = date;
-                      _dateOfBirthController.text =
-                          date.toLocal().toString().split(' ')[0];
-                    },
-                  ),
-                  TextFormField(
-                    controller: _phoneNumberController,
-                    decoration: const InputDecoration(
-                        labelText: 'Phone Number (US Format)',
-                        prefixText: '+1 '),
-                    keyboardType: TextInputType.phone,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                    onSaved: (value) => _phoneNumber = value!,
-                  ),
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(labelText: 'Email'),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null ||
-                          !RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                              .hasMatch(value)) {
-                        return 'Please enter a valid email address';
+                      if (result != null) {
+                        _applicantFirstNameController.text =
+                            result['firstName'];
+                        _applicantLastNameController.text = result['lastName'];
+                        _dateOfBirthController.text = result['dateOfBirth'];
+                        _phoneNumberController.text = result['phoneNumber'];
+                        _emailController.text = result['email'];
+                        _socialSecurityNumberController.text =
+                            result['socialSecurityNumber'];
                       }
-                      return null;
                     },
-                    onSaved: (value) => _email = value!,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blueGrey, // color del botón
+                      minimumSize: const Size(88, 36),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(2)),
+                      ),
+                    ),
+                    child: const Text('Open Registration Form'),
                   ),
-                  TextFormField(
-                    controller: _socialSecurityNumberController,
-                    decoration: const InputDecoration(
-                        labelText: 'Social Security Number'),
-                    onSaved: (value) => _socialSecurityNumber = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: true),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final result = await showDialog<Map<String, dynamic>>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const AddressInformation();
+                        },
+                      );
+
+                      if (result != null) {
+                        _addressController.text = result['address'];
+                        _cityController.text = result['city'];
+                        _stateController.text = result['state'];
+                        _cityZipCodeController.text = result['zipCode'];
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blueGrey, // color del botón
+                      minimumSize: const Size(88, 36),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(2)),
+                      ),
+                    ),
+                    child: const Text('Open Address Form'),
                   ),
                   TextFormField(
                     controller: _idNumberDriverLicenseController,
@@ -420,7 +436,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                         const InputDecoration(labelText: 'ID Issue Date'),
                     onTap: () async {
                       DateTime date = DateTime(1900);
-                      FocusScope.of(context).requestFocus(new FocusNode());
+                      FocusScope.of(context).requestFocus(FocusNode());
 
                       date = (await showDatePicker(
                               context: context,
@@ -444,13 +460,13 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                         const InputDecoration(labelText: 'Expiration Date'),
                     onTap: () async {
                       DateTime date = DateTime(1900);
-                      FocusScope.of(context).requestFocus(new FocusNode());
+                      FocusScope.of(context).requestFocus(FocusNode());
 
                       date = (await showDatePicker(
                               context: context,
                               initialDate: DateTime.now(),
                               firstDate: DateTime(1900),
-                              lastDate: DateTime.now())) ??
+                              lastDate: DateTime(2100))) ??
                           DateTime.now();
                       _expirationDate = date;
                       _expirationDateController.text =
@@ -466,40 +482,12 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     validator: (value) => customValidator(value,
                         isRequired: true, isNumeric: false),
                   ),
-                  TextFormField(
-                    controller: _addressController,
-                    decoration: const InputDecoration(labelText: 'Address'),
-                    onSaved: (value) => _address = value!,
-                  ),
                   DropdownButtonFormField(
-                    decoration: const InputDecoration(labelText: 'State'),
-                    value:
-                        _state.isEmpty ? null : _state, // Asigna el valor aquí
-                    items: _statesList.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: new Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        _state = newValue.toString();
-                      });
-                    },
-                    onSaved: (value) => _state = value!,
-                  ),
-                  TextFormField(
-                    controller: _cityZipCodeController,
-                    decoration:
-                        const InputDecoration(labelText: 'City (Zip Code)'),
-                    onSaved: (value) => _cityZipCode = value!,
-                  ),
-                  DropdownButtonFormField(
-                    value: _state.isEmpty
-                        ? null
-                        : _installationAddressDifferent, // Asigna el valor aquí
                     decoration: const InputDecoration(
                         labelText: 'Is the installation address different?'),
+                    value: _installationAddressDifferent.isEmpty
+                        ? null
+                        : _installationAddressDifferent, // Asigna el valor aquí
                     items: <String>['Yes', 'No']
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
@@ -511,6 +499,21 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                       setState(() {
                         _installationAddressDifferent = newValue!;
                       });
+
+                      if (newValue == 'Yes') {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AddressDialog(
+                              formKey: GlobalKey<FormState>(),
+                              stateList:
+                                  _statesList, // Aquí estamos pasando la lista de estados
+                              onSave: handleSave,
+                              initialState: _state,
+                            );
+                          },
+                        );
+                      }
                     },
                     onSaved: (value) => _installationAddressDifferent = value!,
                   ),
@@ -621,18 +624,23 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     onSaved: (value) => _creditCardExpirationDate = value!,
                   ),
                   ListTile(
-                    title: const Text('Add ACH Info?'),
+                    title: const Text('Add autopayment?'),
                     trailing: ToggleButtons(
-                      children: const [Text('Yes'), Text('No')],
                       isSelected: [_isACHInfoAdded, !_isACHInfoAdded],
                       onPressed: (int index) {
                         setState(() {
                           _isACHInfoAdded = index == 0;
                         });
                       },
+                      children: const [Text('Yes'), Text('No')],
                     ),
                   ),
-
+                  const SizedBox(
+                      height:
+                          10), // Adds some spacing between button and label.
+                  const Text('ID Picture',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.normal)),
                   // Nuevo campo: File Upload
                   ElevatedButton(
                     onPressed: () async {
@@ -647,7 +655,15 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     },
                     child: const Text('Upload File'),
                   ),
-
+                  const SizedBox(
+                      height:
+                          10), // Adds some spacing between button and label.
+                  if (_file != null)
+                    Text('File name: ${_file!.files.single.name}',
+                        style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue)),
                   // Nuevo campo: Signature
                   // Signature(
                   //   color: Colors.red,
@@ -658,21 +674,35 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                   //   backgroundPainter: _WatermarkPaint("2.0", "2.0"),
                   //   strokeWidth: 5.0,
                   // ),
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: 'Date'),
-                    // ... Agrega un validador y selector de fecha aquí,
-                  ),
 
                   ListTile(
                     title: const Text('Do you want to add Co-Applicant?'),
                     trailing: ToggleButtons(
-                      children: const [Text('Yes'), Text('No')],
                       isSelected: [_isCoApplicantAdded, !_isCoApplicantAdded],
                       onPressed: (int index) {
                         setState(() {
                           _isCoApplicantAdded = index == 0;
                         });
+
+                        if (_isCoApplicantAdded) {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return CoApplicantDialog(
+                                formKey: _coApplicantFormKey,
+                                idPurposesList: _idPurposesList,
+                                stateList:
+                                    _statesList, // Aquí estamos pasando la lista de estados
+                                onSave: handleSaveIdPorpouse,
+                                initialState: _state,
+                                initialIDPurpose: _forIDPurposes,
+                                customValidator: customValidator,
+                              );
+                            },
+                          );
+                        }
                       },
+                      children: const [Text('Yes'), Text('No')],
                     ),
                   ),
                   CheckboxListTile(
@@ -681,6 +711,9 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     onChanged: (bool? value) {
                       setState(() {
                         _isIncomeNoticeChecked = value!;
+                        if (_isIncomeNoticeChecked) {
+                          _showProfessionalDialog(context);
+                        }
                       });
                     },
                   ),
@@ -694,27 +727,139 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
     );
   }
 
+  void _showProfessionalDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titlePadding: const EdgeInsets.all(20),
+          contentPadding: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          title: const Text(
+            'Income Notice',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: const SingleChildScrollView(
+            child: Column(
+              children: [
+                Text(
+                  "You need not disclosure alimony, child support or separate maintenance income if you do not wish to have it considered as a basis for repaying this obligation.\n\nBy signing below, you certify that all information given on this application is true and complete. You also authorize us to confirm the information in this application and give out information about you or your account to credit reporting agencies and others who are allowed to receive it.\n\nYou authorize and instruct us to request and receive credit information about you from any credit report agency or third party. If we do not approve this application, you request and authorize us to provide this application and credit information to other finance source witch will consider it under their credit standards.\n\nYou grant the other finance sources the right to request a consumer credit report on you and authorize them to check your credit and employment history. This is also an authorization for Serrato Water to enter the premises in the address given in this application and install the whole house water conditioning system and reverse osmosis once this application is approved.\n\nInstallation and removal charges will occur in case of cancellation after system being installed.",
+                  style: TextStyle(fontSize: 16, height: 1.5),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                backgroundColor: Colors.blue,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void handleSave(
+      String installationAddress, String city, String state, String zipCode) {
+    // Aquí puedes manejar los datos ingresados en el diálogo.
+    // Por ejemplo, podrías almacenarlos en variables de instancia de la clase:
+    _installationAddress = installationAddress;
+    _installationCity = city;
+    _installationState = state;
+    _installationZipCode = zipCode;
+
+    // No olvides llamar a setState para actualizar la interfaz de usuario, si es necesario
+    setState(() {});
+  }
+
+  void handleSaveIdPorpouse(
+      coApplicantName,
+      coApplicantDOB,
+      coApplicantPhoneNumber,
+      coApplicantEmail,
+      coApplicantSSN,
+      coApplicantIDNumber,
+      coApplicantexpirationDate,
+      coApplicantresidenceDuration,
+      coApplicantaddress,
+      coApplicantcity,
+      coApplicantstate,
+      coApplicantzipCode,
+      coApplicantmortgagePayment,
+      coApplicantemployerName,
+      coApplicantemployerPhoneNumber,
+      coApplicantoccupation,
+      coApplicantjobDuration,
+      coApplicantmonthlyIncome,
+      coApplicantotherIncome,
+      coApplicantotherIncomeSource,
+      coApplicantidPurpose,
+      coApplicantcreditCardExpiration) {
+    _coApplicantName = coApplicantName;
+    _coApplicantDOB = coApplicantDOB;
+    _coApplicantPhoneNumber = coApplicantPhoneNumber;
+    _coApplicantEmail = coApplicantEmail;
+    _coApplicantSSN = coApplicantSSN;
+    _coApplicantIDNumber = coApplicantIDNumber;
+    _coApplicantexpirationDate = coApplicantexpirationDate;
+    _coApplicantresidenceDuration = coApplicantresidenceDuration;
+    _coApplicantaddress = coApplicantaddress;
+    _coApplicantcity = coApplicantcity;
+    _coApplicantstate = coApplicantstate;
+    _coApplicantzipCode = coApplicantzipCode;
+    _coApplicantmortgagePayment = coApplicantmortgagePayment;
+    _coApplicantemployerName = coApplicantemployerName;
+    _coApplicantemployerPhoneNumber = coApplicantemployerPhoneNumber;
+    _coApplicantoccupation = coApplicantoccupation;
+    _coApplicantjobDuration = coApplicantjobDuration;
+    _coApplicantmonthlyIncome = coApplicantmonthlyIncome;
+    _coApplicantotherIncome = coApplicantotherIncome;
+    _coApplicantotherIncomeSource = coApplicantotherIncomeSource;
+    _coApplicantidPurpose = coApplicantidPurpose;
+    _coApplicantcreditCardExpiration = coApplicantcreditCardExpiration;
+
+    // No olvides llamar a setState para actualizar la interfaz de usuario, si es necesario
+    setState(() {});
+  }
+
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
       final applicationData = {
-        "saleAmount": _saleAmount,
-        "hardness": _hardness,
-        "salesRepresentative": _salesRepresentative,
-        "productsSold": _productsSold,
-        "applicantName": _applicantFirstName,
+        "saleAmount": _saleAmountController.text,
+        "salesRepresentative": _user,
+        "productsSold": _selectedProducts.join(", "),
+        "applicantName":
+            "${_applicantFirstNameController.text} ${_applicantLastNameController.text}",
         "dateOfBirth": _dateOfBirth.toIso8601String(),
-        "phoneNumber": _phoneNumber,
-        "email": _email,
-        "socialSecurityNumber": _socialSecurityNumber,
-        "idNumberDriverLicense": _idNumberDriverLicense,
+        "phoneNumber": _phoneNumberController.text,
+        "email": _emailController.text,
+        "socialSecurityNumber": _socialSecurityNumberController.text,
+        "idNumberDriverLicense": _idNumberDriverLicenseController.text,
         "idIssueDate": _idIssueDate.toIso8601String(),
         "expirationDate": _expirationDate.toIso8601String(),
         "timeAtResidence": _timeAtResidence,
-        "address": _address,
+        "address": _addressController.text,
         "state": _state,
-        "cityZipCode": _cityZipCode,
+        "cityZipCode": _cityZipCodeController.text,
         "installationAddressDifferent": _installationAddressDifferent,
         "monthlyMortgagePayment": _monthlyMortgagePayment,
         "employerName": _employerName,
@@ -729,8 +874,12 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         "isACHInfoAdded": _isACHInfoAdded,
         "isIncomeNoticeChecked": _isIncomeNoticeChecked,
         "isCoApplicantAdded": _isCoApplicantAdded,
-        "selectedProduct": _selectedProduct,
         "userOwner": _user,
+        "installationAddress": _installationAddress,
+        "installationCity": _installationCity,
+        "installationState": _installationState,
+        "installationZipCode": _installationZipCode,
+        "date": DateTime.now()
       };
 
       BlocProvider.of<CreditApplicationBloc>(context)
@@ -788,8 +937,6 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
 
   void _clearFormFields() {
     _saleAmountController.clear();
-    _hardnessController.clear();
-    _salesRepresentativeController.clear();
     _productsSoldController.clear();
     _applicantFirstNameController.clear();
     _applicantLastNameController.clear();

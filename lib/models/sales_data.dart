@@ -1,7 +1,6 @@
 class SaleData {
   String applicantName;
   String saleAmount;
-  String hardness;
   String salesRepresentative;
   String productsSold;
   String applicantFirstName;
@@ -32,11 +31,14 @@ class SaleData {
   bool isIncomeNoticeChecked;
   bool isCoApplicantAdded;
   String user;
+  String installationAddress;
+  String installationCity;
+  String installationState;
+  String installationZipCode;
 
   SaleData({
     required this.applicantName,
     required this.saleAmount,
-    required this.hardness,
     required this.salesRepresentative,
     required this.productsSold,
     required this.applicantFirstName,
@@ -67,13 +69,16 @@ class SaleData {
     required this.isIncomeNoticeChecked,
     required this.isCoApplicantAdded,
     required this.user,
+    required this.installationAddress,
+    required this.installationCity,
+    required this.installationState,
+    required this.installationZipCode,
   });
 
   // Método para convertir un objeto SaleData a un mapa, útil para operaciones de base de datos
   Map<String, dynamic> toMap() {
     return {
       'saleAmount': saleAmount,
-      'hardness': hardness,
       'salesRepresentative': salesRepresentative,
       'productsSold': productsSold,
       'applicantFirstName': applicantFirstName,
@@ -104,6 +109,10 @@ class SaleData {
       'isIncomeNoticeChecked': isIncomeNoticeChecked,
       'isCoApplicantAdded': isCoApplicantAdded,
       'user': user,
+      'installationAddress': installationAddress,
+      'installationCity': installationCity,
+      'installationState': installationState,
+      'installationZipCode': installationZipCode,
     };
   }
 
@@ -112,7 +121,6 @@ class SaleData {
     return SaleData(
       applicantName: map['applicantName'],
       saleAmount: map['saleAmount'],
-      hardness: map['hardness'],
       salesRepresentative: map['salesRepresentative'],
       productsSold: map['productsSold'],
       applicantFirstName: map['applicantFirstName'] ?? '',
@@ -143,6 +151,10 @@ class SaleData {
       isIncomeNoticeChecked: map['isIncomeNoticeChecked'],
       isCoApplicantAdded: map['isCoApplicantAdded'],
       user: map['userOwner'],
+      installationAddress: map['installationAddress'] ?? '',
+      installationCity: map['installationCity'] ?? '',
+      installationState: map['installationState'] ?? '',
+      installationZipCode: map['installationZipCode'] ?? '',
     );
   }
 
@@ -152,7 +164,6 @@ class SaleData {
     return SaleData(
       applicantName: data['applicantName'] ?? '',
       saleAmount: data['saleAmount'] ?? '',
-      hardness: data['hardness'] ?? '',
       salesRepresentative: data['salesRepresentative'] ?? '',
       productsSold: data['productsSold'] ?? '',
       applicantFirstName: data['applicantName']?.split(' ')[0] ??
@@ -189,6 +200,10 @@ class SaleData {
       isIncomeNoticeChecked: data['isIncomeNoticeChecked'] ?? false,
       isCoApplicantAdded: data['isCoApplicantAdded'] ?? false,
       user: data['userOwner'] ?? '',
+      installationAddress: data['installationAddress'] ?? '',
+      installationCity: data['installationCity'] ?? '',
+      installationState: data['installationState'] ?? '',
+      installationZipCode: data['installationZipCode'] ?? '',
     );
   }
 }

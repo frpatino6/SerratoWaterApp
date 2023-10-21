@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:serrato_water_app/api/fireBaseApi.dart';
 import 'package:serrato_water_app/bloc/auth/auth_bloc.dart';
 import 'package:serrato_water_app/bloc/auth/auth_event.dart';
 import 'package:serrato_water_app/bloc/auth/auth_state.dart';
@@ -19,6 +18,12 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    _emailController.text = "frpatino6@gmail.com";
+    _passwordController.text = "123456";
+  }
 
   @override
   Widget build(BuildContext context) {
