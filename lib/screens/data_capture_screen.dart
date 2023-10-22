@@ -2,10 +2,11 @@
 
 import 'dart:ui' as ui;
 
+// ignore: unused_import
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:provider/provider.dart';
 import 'package:serrato_water_app/bloc/credit_application/credit_application_bloc.dart';
 import 'package:serrato_water_app/bloc/credit_application/credit_application_event.dart';
@@ -16,8 +17,10 @@ import 'package:serrato_water_app/screens/mis_transacciones_screen.dart';
 import 'package:flutter_signature_pad/flutter_signature_pad.dart';
 import 'package:serrato_water_app/widgets/addres_information.dart';
 import 'package:serrato_water_app/widgets/address_dialog.dart';
-import 'package:serrato_water_app/widgets/co_application_dialog.dart';
+import 'package:serrato_water_app/widgets/identification_information.dart';
 import 'package:serrato_water_app/widgets/personal_information.dart';
+import 'package:serrato_water_app/widgets/products_sale.dart';
+import 'package:serrato_water_app/widgets/work_information.dart';
 
 class DataCaptureScreen extends StatefulWidget {
   const DataCaptureScreen({super.key});
@@ -101,8 +104,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
       TextEditingController();
   final TextEditingController _forIDPurposesController =
       TextEditingController();
-  final TextEditingController _creditCardExpirationDateController =
-      TextEditingController();
+  late MaskedTextController _creditCardExpirationDateController;
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _timeAtResidenceController =
       TextEditingController();
@@ -111,30 +113,24 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   final String _hardness = '';
   final String _salesRepresentative = '';
   final String _productsSold = '';
-  String _applicantFirstName = '';
-  String _applicantLastName = '';
   DateTime _dateOfBirth = DateTime.now();
-  String _phoneNumber = '';
-  String _email = '';
-  String _socialSecurityNumber = '';
-  String _idNumberDriverLicense = '';
   DateTime _idIssueDate = DateTime.now();
   DateTime _expirationDate = DateTime.now();
   int _timeAtResidence = 0;
-  String _address = '';
-  String _state = '';
-  String _cityZipCode = '';
-  String _installationAddressDifferent = 'No';
-  String _monthlyMortgagePayment = '';
-  String _employerName = '';
-  String _employerPhoneNumber = '';
-  String _occupation = '';
-  String _timeAtCurrentJob = '';
-  String _employmentMonthlyIncome = '';
-  String _otherIncome = '';
-  String _sourceOfOtherIncome = '';
+  final String _address = '';
+  final String _state = '';
+  final String _cityZipCode = '';
+  bool _installationAddressDifferent = false;
+
+  final String _employerName = '';
+  final String _employerPhoneNumber = '';
+  final String _occupation = '';
+  final String _timeAtCurrentJob = '';
+  final String _employmentMonthlyIncome = '';
+  final String _otherIncome = '';
+  final String _sourceOfOtherIncome = '';
   String _forIDPurposes = '';
-  String _creditCardExpirationDate = '';
+
   bool _isACHInfoAdded = false;
   bool _isIncomeNoticeChecked = false;
   bool _isCoApplicantAdded = false;
@@ -165,8 +161,8 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   String _coApplicantotherIncomeSource = '';
   String _coApplicantidPurpose = '';
   String _coApplicantcreditCardExpiration = '';
-  String _city = '';
-  FilePickerResult? _file;
+  final String _city = '';
+
   final List<String> _products = [
     "Hydronex 30C",
     "Well Water System",
@@ -228,13 +224,13 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
     "Wisconsin",
     "Wyoming"
   ];
-  bool _isChequed = false;
+  final bool _isChequed = false;
 
   final List<String> _idPurposesList = [
     "VISA",
     "MASTERCARD",
     "AMERICAN EXPRESS",
-    "DINERS"
+    "DISCOVER",
   ];
 
   @override
@@ -324,42 +320,34 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
               key: _formKey,
               child: ListView(
                 children: <Widget>[
-                  TextFormField(
-                    controller: _saleAmountController,
-                    decoration:
-                        const InputDecoration(labelText: 'Sale Amount (\$)'),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    onSaved: (value) => _saleAmount = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isCurrency: true, min: 0.01),
-                  ),
-                  MultiSelectBottomSheetField<String?>(
-                    initialChildSize: 0.4,
-                    maxChildSize: 1.0,
-                    listType: MultiSelectListType.LIST,
-                    searchable: true,
-                    buttonText: const Text('Select Products'),
-                    title: const Text('Products'),
-                    items: _products
-                        .map((product) =>
-                            MultiSelectItem<String?>(product, product))
-                        .toList(),
-                    onConfirm: (List<String?> values) {
-                      setState(() {
-                        _selectedProducts =
-                            values.map((String? value) => value!).toList();
-                      });
+                  ElevatedButton(
+                    onPressed: () async {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return ProductsDialog(
+                            onSubmit: (selectedProducts, cost) {
+                              // Aquí, `selectedProducts` es una lista de productos seleccionados,
+                              // y `cost` es el valor ingresado para el costo.
+                              // Puedes proceder con estos datos como necesites.
+                              _selectedProducts = selectedProducts;
+                              _saleAmountController.text = cost;
+                            },
+                          );
+                        },
+                      );
                     },
-                    chipDisplay: MultiSelectChipDisplay(
-                      onTap: (value) {
-                        setState(() {
-                          _selectedProducts.remove(value);
-                        });
-                      },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blueGrey, // color del botón
+                      minimumSize: const Size(88, 36),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(2)),
+                      ),
                     ),
+                    child: const Text('Products Sale'),
                   ),
-                  // add ElevationButtom
                   ElevatedButton(
                     onPressed: () async {
                       final result = await showDialog<Map<String, dynamic>>(
@@ -388,7 +376,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                         borderRadius: BorderRadius.all(Radius.circular(2)),
                       ),
                     ),
-                    child: const Text('Open Registration Form'),
+                    child: const Text('Personal Information'),
                   ),
                   ElevatedButton(
                     onPressed: () async {
@@ -404,6 +392,10 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                         _cityController.text = result['city'];
                         _stateController.text = result['state'];
                         _cityZipCodeController.text = result['zipCode'];
+                        _timeAtResidenceController.text =
+                            result['timeAtResidence'];
+                        _monthlyMortgagePaymentController.text =
+                            result['monthlyMortgagePayment'];
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -415,292 +407,109 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                         borderRadius: BorderRadius.all(Radius.circular(2)),
                       ),
                     ),
-                    child: const Text('Open Address Form'),
+                    child: const Text('Address'),
                   ),
-                  TextFormField(
-                    controller: _idNumberDriverLicenseController,
-                    decoration: const InputDecoration(
-                        labelText: 'ID Number (Driver License)'),
-                    onSaved: (value) => _idNumberDriverLicense = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                  ),
-                  TextFormField(
-                    controller: _idIssueDateController,
-                    validator: (value) => customValidator(value,
-                        isRequired: true,
-                        isDate: true,
-                        minDate: DateTime(1900),
-                        maxDate: DateTime.now()),
-                    decoration:
-                        const InputDecoration(labelText: 'ID Issue Date'),
-                    onTap: () async {
-                      DateTime date = DateTime(1900);
-                      FocusScope.of(context).requestFocus(FocusNode());
-
-                      date = (await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(1900),
-                              lastDate: DateTime.now())) ??
-                          DateTime.now();
-                      _idIssueDate = date;
-                      _idIssueDateController.text =
-                          date.toLocal().toString().split(' ')[0];
-                    },
-                  ),
-                  TextFormField(
-                    controller: _expirationDateController,
-                    validator: (value) => customValidator(value,
-                        isRequired: true,
-                        isDate: true,
-                        minDate: DateTime(1900),
-                        maxDate: DateTime.now()),
-                    decoration:
-                        const InputDecoration(labelText: 'Expiration Date'),
-                    onTap: () async {
-                      DateTime date = DateTime(1900);
-                      FocusScope.of(context).requestFocus(FocusNode());
-
-                      date = (await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(1900),
-                              lastDate: DateTime(2100))) ??
-                          DateTime.now();
-                      _expirationDate = date;
-                      _expirationDateController.text =
-                          date.toLocal().toString().split(' ')[0];
-                    },
-                  ),
-                  TextFormField(
-                    controller: _timeAtResidenceController,
-                    decoration: const InputDecoration(
-                        labelText: 'Time at Residence (in months)'),
-                    keyboardType: TextInputType.number,
-                    onSaved: (value) => _timeAtResidence = int.parse(value!),
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                  ),
-                  DropdownButtonFormField(
-                    decoration: const InputDecoration(
-                        labelText: 'Is the installation address different?'),
-                    value: _installationAddressDifferent.isEmpty
-                        ? null
-                        : _installationAddressDifferent, // Asigna el valor aquí
-                    items: <String>['Yes', 'No']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final result = await showDialog<Map<String, dynamic>>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const IdentificationInformation();
+                        },
                       );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _installationAddressDifferent = newValue!;
-                      });
 
-                      if (newValue == 'Yes') {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AddressDialog(
-                              formKey: GlobalKey<FormState>(),
-                              stateList:
-                                  _statesList, // Aquí estamos pasando la lista de estados
-                              onSave: handleSave,
-                              initialState: _state,
-                            );
-                          },
-                        );
+                      if (result != null) {
+                        _idNumberDriverLicenseController.text =
+                            result['idNumberDriverLicense'];
+                        _idIssueDateController.text =
+                            result['idIssueDate'].toString();
+                        _expirationDateController.text =
+                            result['expirationDate'].toString();
+                        _forIDPurposesController.text = result['forIDPurposes'];
+                        _creditCardExpirationDateController.text =
+                            result['creditCardExpirationDate'];
                       }
                     },
-                    onSaved: (value) => _installationAddressDifferent = value!,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blueGrey, // color del botón
+                      minimumSize: const Size(88, 36),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(2)),
+                      ),
+                    ),
+                    child: const Text('Identification'),
                   ),
-                  TextFormField(
-                    controller: _monthlyMortgagePaymentController,
-                    decoration: const InputDecoration(
-                        labelText: 'Monthly Mortgage Payment (\$)'),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    onSaved: (value) => _monthlyMortgagePayment = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isCurrency: true, min: 0.01),
-                  ),
-                  TextFormField(
-                    controller: _employerNameController,
-                    decoration:
-                        const InputDecoration(labelText: 'Employer Name'),
-                    onSaved: (value) => _employerName = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                  ),
-                  TextFormField(
-                    controller: _employerPhoneNumberController,
-                    decoration: const InputDecoration(
-                        labelText: 'Employer Phone Number', prefixText: '+1 '),
-                    keyboardType: TextInputType.phone,
-                    onSaved: (value) => _employerPhoneNumber = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                  ),
-                  TextFormField(
-                    controller: _occupationController,
-                    decoration: const InputDecoration(labelText: 'Occupation'),
-                    onSaved: (value) => _occupation = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                  ),
-                  TextFormField(
-                    controller: _timeAtCurrentJobController,
-                    decoration:
-                        const InputDecoration(labelText: 'Time at Current Job'),
-                    onSaved: (value) => _timeAtCurrentJob = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                  ),
-                  TextFormField(
-                    controller: _employmentMonthlyIncomeController,
-                    decoration: const InputDecoration(
-                        labelText: 'Employment Monthly Income (\$)'),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    onSaved: (value) => _employmentMonthlyIncome = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isCurrency: true, min: 0.01),
-                  ),
-                  TextFormField(
-                    controller: _otherIncomeController,
-                    decoration:
-                        const InputDecoration(labelText: 'Other Income (\$)'),
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isCurrency: true, min: 0.01),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    onSaved: (value) => _otherIncome = value!,
-                  ),
-                  TextFormField(
-                    controller: _sourceOfOtherIncomeController,
-                    decoration: const InputDecoration(
-                        labelText: 'Source of Other Income'),
-                    onSaved: (value) => _sourceOfOtherIncome = value!,
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                  ),
-                  DropdownButtonFormField(
-                    value: _state.isEmpty
-                        ? null
-                        : _forIDPurposes, // Asigna el valor aquí
-                    decoration:
-                        const InputDecoration(labelText: 'For ID purposes'),
-                    items: _idPurposesList.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final result = await showDialog<Map<String, dynamic>>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const WorkInformation();
+                        },
                       );
-                    }).toList(),
-                    validator: (value) => customValidator(value,
-                        isRequired: true, isNumeric: false),
-                    onChanged: (newValue) {
-                      setState(() {
-                        _forIDPurposes = newValue.toString();
-                      });
-                    },
-                    onSaved: (value) => _forIDPurposes = value!,
-                  ),
-                  TextFormField(
-                    controller: _creditCardExpirationDateController,
-                    decoration: const InputDecoration(
-                        labelText: 'Credit Card Expiration Date (MM/YY)'),
-                    keyboardType: TextInputType.datetime,
-                    validator: (value) {
-                      if (value == null ||
-                          !RegExp(r"^(0[1-9]|1[0-2])\/([0-9]{2})$")
-                              .hasMatch(value)) {
-                        return 'Please enter a valid date in MM/YY format';
+
+                      if (result != null) {
+                        _employerNameController.text = result['employerName'];
+                        _employerPhoneNumberController.text =
+                            result['employerPhoneNumber'];
+                        _occupationController.text = result['occupation'];
+                        _timeAtCurrentJobController.text =
+                            result['timeAtCurrentJob'];
+                        _employmentMonthlyIncomeController.text =
+                            result['employmentMonthlyIncome'];
+                        _otherIncomeController.text = result['otherIncome'];
+                        _sourceOfOtherIncomeController.text =
+                            result['sourceOtherIncome'];
                       }
-                      return null;
                     },
-                    onSaved: (value) => _creditCardExpirationDate = value!,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blueGrey, // color del botón
+                      minimumSize: const Size(88, 36),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(2)),
+                      ),
+                    ),
+                    child: const Text('Work information'),
                   ),
                   ListTile(
-                    title: const Text('Add autopayment?'),
+                    title: const Text('Is the installation address different?'),
+                    trailing: ToggleButtons(
+                      isSelected: [_isCoApplicantAdded, !_isCoApplicantAdded],
+                      onPressed: (int index) {
+                        setState(() {
+                          _installationAddressDifferent = index == 0;
+                        });
+
+                        if (_installationAddressDifferent) {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AddressDialog(
+                                formKey: GlobalKey<FormState>(),
+                                stateList:
+                                    _statesList, // Aquí estamos pasando la lista de estados
+                                onSave: handleSave,
+                                initialState: _state,
+                              );
+                            },
+                          );
+                        }
+                      },
+                      children: const [Text('Yes'), Text('No')],
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Enroll in AutoPay?'),
                     trailing: ToggleButtons(
                       isSelected: [_isACHInfoAdded, !_isACHInfoAdded],
                       onPressed: (int index) {
                         setState(() {
                           _isACHInfoAdded = index == 0;
                         });
-                      },
-                      children: const [Text('Yes'), Text('No')],
-                    ),
-                  ),
-                  const SizedBox(
-                      height:
-                          10), // Adds some spacing between button and label.
-                  const Text('ID Picture',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.normal)),
-                  // Nuevo campo: File Upload
-                  ElevatedButton(
-                    onPressed: () async {
-                      FilePickerResult? result =
-                          await FilePicker.platform.pickFiles();
-
-                      if (result != null) {
-                        setState(() {
-                          _file = result;
-                        });
-                      }
-                    },
-                    child: const Text('Upload File'),
-                  ),
-                  const SizedBox(
-                      height:
-                          10), // Adds some spacing between button and label.
-                  if (_file != null)
-                    Text('File name: ${_file!.files.single.name}',
-                        style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue)),
-                  // Nuevo campo: Signature
-                  // Signature(
-                  //   color: Colors.red,
-                  //   key: _sign,
-                  //   onSign: () {
-                  //     final sign = _sign.currentState;
-                  //   },
-                  //   backgroundPainter: _WatermarkPaint("2.0", "2.0"),
-                  //   strokeWidth: 5.0,
-                  // ),
-
-                  ListTile(
-                    title: const Text('Do you want to add Co-Applicant?'),
-                    trailing: ToggleButtons(
-                      isSelected: [_isCoApplicantAdded, !_isCoApplicantAdded],
-                      onPressed: (int index) {
-                        setState(() {
-                          _isCoApplicantAdded = index == 0;
-                        });
-
-                        if (_isCoApplicantAdded) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return CoApplicantDialog(
-                                formKey: _coApplicantFormKey,
-                                idPurposesList: _idPurposesList,
-                                stateList:
-                                    _statesList, // Aquí estamos pasando la lista de estados
-                                onSave: handleSaveIdPorpouse,
-                                initialState: _state,
-                                initialIDPurpose: _forIDPurposes,
-                                customValidator: customValidator,
-                              );
-                            },
-                          );
-                        }
                       },
                       children: const [Text('Yes'), Text('No')],
                     ),
@@ -861,7 +670,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         "state": _state,
         "cityZipCode": _cityZipCodeController.text,
         "installationAddressDifferent": _installationAddressDifferent,
-        "monthlyMortgagePayment": _monthlyMortgagePayment,
+        "monthlyMortgagePayment": _monthlyMortgagePaymentController.text,
         "employerName": _employerName,
         "employerPhoneNumber": _employerPhoneNumber,
         "occupation": _occupation,
@@ -870,7 +679,6 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         "otherIncome": _otherIncome,
         "sourceOfOtherIncome": _sourceOfOtherIncome,
         "forIDPurposes": _forIDPurposes,
-        "creditCardExpirationDate": _creditCardExpirationDate,
         "isACHInfoAdded": _isACHInfoAdded,
         "isIncomeNoticeChecked": _isIncomeNoticeChecked,
         "isCoApplicantAdded": _isCoApplicantAdded,

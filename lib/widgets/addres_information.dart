@@ -12,11 +12,17 @@ class _AddressInformationState extends State<AddressInformation> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _cityZipCodeController = TextEditingController();
+  final TextEditingController _monthlyMortgagePaymentController =
+      TextEditingController();
+  final TextEditingController _timeAtResidenceController =
+      TextEditingController();
 
   String _address = '';
   String _city = '';
   String _state = '';
   String _cityZipCode = '';
+  String _monthlyMortgagePayment = '';
+  int _timeAtResidence = 0;
 
   final List<String> _statesList = [
     "Alabama",
@@ -89,6 +95,8 @@ class _AddressInformationState extends State<AddressInformation> {
         'city': _city,
         'state': _state,
         'zipCode': _cityZipCode,
+        'monthlyMortgagePayment': _monthlyMortgagePayment,
+        'timeAtResidence': _timeAtResidence,
       };
 
       // Devolver los datos y cerrar el diálogo
@@ -136,6 +144,21 @@ class _AddressInformationState extends State<AddressInformation> {
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'City (Zip Code)'),
                 onSaved: (value) => _cityZipCode = value!,
+              ),
+              TextFormField(
+                controller: _monthlyMortgagePaymentController,
+                decoration: const InputDecoration(
+                    labelText: 'Monthly Mortgage Payment (\$)'),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                onSaved: (value) => _monthlyMortgagePayment = value!,
+              ),
+              TextFormField(
+                controller: _timeAtResidenceController,
+                decoration: const InputDecoration(
+                    labelText: 'Time at Residence (in months)'),
+                keyboardType: TextInputType.number,
+                onSaved: (value) => _timeAtResidence = int.parse(value!),
               ),
             ],
           ),
