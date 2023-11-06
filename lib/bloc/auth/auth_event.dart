@@ -38,5 +38,5 @@ class RegisterEvent extends AuthEvent {
 class LoadUserListEvent extends AuthEvent {
   final String selectedUserType;
 
-  LoadUserListEvent(this.selectedUserType);
+  const LoadUserListEvent(this.selectedUserType);
 }

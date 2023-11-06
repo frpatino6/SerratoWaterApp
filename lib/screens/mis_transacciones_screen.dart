@@ -8,7 +8,7 @@ import 'package:serrato_water_app/models/sales_data.dart';
 import 'package:serrato_water_app/providers/user_provider.dart';
 
 class MisTransaccionesScreen extends StatelessWidget {
-  MisTransaccionesScreen();
+  const MisTransaccionesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +79,7 @@ class MisTransaccionesScreen extends StatelessWidget {
 class CustomListItem extends StatelessWidget {
   final SaleData saleData;
 
-  CustomListItem({required this.saleData});
+  const CustomListItem({super.key, required this.saleData});
 
   @override
   Widget build(BuildContext context) {

@@ -17,6 +17,7 @@ import 'package:serrato_water_app/screens/mis_transacciones_screen.dart';
 import 'package:flutter_signature_pad/flutter_signature_pad.dart';
 import 'package:serrato_water_app/widgets/addres_information.dart';
 import 'package:serrato_water_app/widgets/address_dialog.dart';
+import 'package:serrato_water_app/widgets/bank_detail.dart';
 import 'package:serrato_water_app/widgets/identification_information.dart';
 import 'package:serrato_water_app/widgets/personal_information.dart';
 import 'package:serrato_water_app/widgets/products_sale.dart';
@@ -108,8 +109,15 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _timeAtResidenceController =
       TextEditingController();
+  final TextEditingController _bankNameController = TextEditingController();
+  final TextEditingController _accountHolderController =
+      TextEditingController();
+  final TextEditingController _routingNumberController =
+      TextEditingController();
+  final TextEditingController _accountNumberController =
+      TextEditingController();
 
-  String _saleAmount = '';
+  final String _saleAmount = '';
   final String _hardness = '';
   final String _salesRepresentative = '';
   final String _productsSold = '';
@@ -129,7 +137,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   final String _employmentMonthlyIncome = '';
   final String _otherIncome = '';
   final String _sourceOfOtherIncome = '';
-  String _forIDPurposes = '';
+  final String _forIDPurposes = '';
 
   bool _isACHInfoAdded = false;
   bool _isIncomeNoticeChecked = false;
@@ -327,11 +335,10 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                         builder: (context) {
                           return ProductsDialog(
                             onSubmit: (selectedProducts, cost) {
-                              // Aquí, `selectedProducts` es una lista de productos seleccionados,
-                              // y `cost` es el valor ingresado para el costo.
-                              // Puedes proceder con estos datos como necesites.
-                              _selectedProducts = selectedProducts;
-                              _saleAmountController.text = cost;
+                              setState(() {
+                                _selectedProducts = selectedProducts;
+                                _saleAmountController.text = cost;
+                              });
                             },
                           );
                         },
@@ -347,6 +354,24 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                       ),
                     ),
                     child: const Text('Products Sale'),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8, // Espacio entre los Chips
+                    children: _selectedProducts
+                        .map((product) => Chip(
+                              label: Text(product!),
+                              backgroundColor: Colors.blue,
+                              labelStyle: const TextStyle(color: Colors.white),
+                              deleteIcon:
+                                  const Icon(Icons.close, color: Colors.white),
+                              onDeleted: () {
+                                setState(() {
+                                  _selectedProducts.remove(product);
+                                });
+                              },
+                            ))
+                        .toList(),
                   ),
                   ElevatedButton(
                     onPressed: () async {
@@ -510,6 +535,25 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                         setState(() {
                           _isACHInfoAdded = index == 0;
                         });
+
+                        // Si el usuario selecciona 'Yes' (index 0), mostrar el diálogo
+                        if (index == 0) {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return BankDetailsDialog(
+                                onSubmit: (bankName, accountHolder,
+                                    routingNumber, accountNumber) {
+                                  // Aquí puedes procesar y guardar los datos del banco.
+                                  _bankNameController.text = bankName;
+                                  _accountHolderController.text = accountHolder;
+                                  _routingNumberController.text = routingNumber;
+                                  _accountNumberController.text = accountNumber;
+                                },
+                              );
+                            },
+                          );
+                        }
                       },
                       children: const [Text('Yes'), Text('No')],
                     ),
@@ -566,8 +610,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white, backgroundColor: Colors.blue,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 shape: RoundedRectangleBorder(
@@ -687,7 +730,11 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         "installationCity": _installationCity,
         "installationState": _installationState,
         "installationZipCode": _installationZipCode,
-        "date": DateTime.now()
+        "date": DateTime.now(),
+        "bankName": _bankNameController.text,
+        "accountHolder": _accountHolderController.text,
+        "routingNumber": _routingNumberController.text,
+        "accountNumber": _accountNumberController.text,
       };
 
       BlocProvider.of<CreditApplicationBloc>(context)
@@ -699,7 +746,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
     if (choice == 'My transactions') {
       // Aquí puedes navegar a la pantalla de "Mis Transacciones" o realizar cualquier otra acción que necesites.
       Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => MisTransaccionesScreen()));
+          .push(MaterialPageRoute(builder: (_) => const MisTransaccionesScreen()));
     }
   }
 

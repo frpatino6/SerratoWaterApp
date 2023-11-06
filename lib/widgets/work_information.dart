@@ -144,8 +144,8 @@ class _WorkInformationState extends State<WorkInformation> {
           },
         ),
         TextButton(
-          child: const Text('Submit'),
           onPressed: _submitForm,
+          child: const Text('Submit'),
         ),
       ],
     );
