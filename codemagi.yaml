@@ -1,0 +1,25 @@
+workflows:
+  flutter-workflow:
+    name: Flutter Workflow
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install dependencies
+        script: flutter pub get
+      - name: Run tests
+        script: flutter test
+      - name: Build apk
+        script: flutter build apk --release
+      - name: Build ipa for publishing
+        script: |
+          flutter build ios --release --no-codesign
+    artifacts:
+      - build/**/outputs/apk/**/*.apk
+      - build/**/outputs/ios/ipa/*.ipa
+    publishing:
+      email:
+        recipients:
+          - frpatino6@gmail.com # change with your email
+        subject: Serrato Water App
