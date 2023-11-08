@@ -23,7 +23,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     } else if (event is RegisterEvent) {
       try {
-        final result = await api.signUp(event.email, event.password);
+        final result = await api.signUp(
+            event.email, event.password, event.firstName, event.lastName);
         if (result.containsKey('error')) {
           yield AuthFailure(result['error']['message']);
         } else {
@@ -32,6 +33,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } catch (error) {
         yield AuthFailure(error.toString());
       }
+    } else if (event is LoadUserListEvent) {
+      try {
+        final List<String> userList =
+            await api.loadUserListFromDatabase(event.selectedUserType);
+        yield UserListLoadedState(userList);
+      } catch (error) {
+        yield AuthFailure(error.toString());
+      }
+    }
+    // En auth_bloc.dart, dentro de mapEventToState:
+    if (event is LogoutEvent) {
+      // Aquí llamarías al método que maneja el cierre de sesión en tu API
+
+      yield AuthInitial(); // Regresa al estado inicial que representa un usuario no autenticado.
     }
   }
 }

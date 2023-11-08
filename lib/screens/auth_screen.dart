@@ -1,33 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:serrato_water_app/api/fireBaseApi.dart';
+import 'package:provider/provider.dart';
 import 'package:serrato_water_app/bloc/auth/auth_bloc.dart';
 import 'package:serrato_water_app/bloc/auth/auth_event.dart';
 import 'package:serrato_water_app/bloc/auth/auth_state.dart';
-import 'package:serrato_water_app/screens/data_capture_screen.dart';
-
-// Asegúrate de importar los archivos necesarios.
-
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Login Professional',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: BlocProvider(
-        create: (context) => AuthBloc(api: FirebaseAPI()),
-        child: AuthScreen(),
-      ),
-    );
-  }
-}
+import 'package:serrato_water_app/providers/user_provider.dart';
+import 'package:serrato_water_app/screens/dashboard_screen.dart';
+import 'package:serrato_water_app/screens/register_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthScreen extends StatefulWidget {
+  const AuthScreen({super.key});
+
   @override
   _AuthScreenState createState() => _AuthScreenState();
 }
@@ -35,19 +19,35 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+
+    checkLoginStatus(context);
+
+    _emailController.text = "frpatino6@gmail.com";
+    _passwordController.text = "123456";
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is AuthFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.error)),
             );
           } else if (state is AuthSuccess) {
+            Provider.of<UserProvider>(context, listen: false)
+                .setUsername(_emailController.text);
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('isLoggedIn', true);
+            await prefs.setString('username', _emailController.text);
+            await prefs.setString('password', _passwordController.text);
+
             Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => const DataCaptureScreen()));
+                MaterialPageRoute(builder: (_) => const DashboardScreen()));
           }
         },
         builder: (context, state) {
@@ -59,7 +59,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Image.asset(
-                      "assets/images/logo.png", // Suponiendo que tienes un logo en tus assets.
+                      "assets/images/logo.png",
                       height: 180,
                       width: 280,
                     ),
@@ -114,8 +114,15 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(height: 20),
                     TextButton(
                       onPressed: () {
-                        context.read<AuthBloc>().add(RegisterEvent(
-                            _emailController.text, _passwordController.text));
+                        // navigate to Register Screen
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => BlocProvider.value(
+                              value: BlocProvider.of<AuthBloc>(context),
+                              child: RegisterScreen(),
+                            ),
+                          ),
+                        );
                       },
                       child: const Text('Register'),
                     ),
@@ -127,5 +134,18 @@ class _AuthScreenState extends State<AuthScreen> {
         },
       ),
     );
+  }
+}
+
+Future<bool> isUserLoggedIn() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('isLoggedIn') ?? false;
+}
+
+void checkLoginStatus(BuildContext context) async {
+  bool isLoggedIn = await isUserLoggedIn();
+  if (isLoggedIn) {
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const DashboardScreen()));
   }
 }
