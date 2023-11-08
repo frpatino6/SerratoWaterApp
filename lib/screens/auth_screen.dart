@@ -5,8 +5,9 @@ import 'package:serrato_water_app/bloc/auth/auth_bloc.dart';
 import 'package:serrato_water_app/bloc/auth/auth_event.dart';
 import 'package:serrato_water_app/bloc/auth/auth_state.dart';
 import 'package:serrato_water_app/providers/user_provider.dart';
-import 'package:serrato_water_app/screens/data_capture_screen.dart';
+import 'package:serrato_water_app/screens/dashboard_screen.dart';
 import 'package:serrato_water_app/screens/register_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -21,6 +22,9 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   void initState() {
     super.initState();
+
+    checkLoginStatus(context);
+
     _emailController.text = "frpatino6@gmail.com";
     _passwordController.text = "123456";
   }
@@ -29,7 +33,7 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is AuthFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.error)),
@@ -37,8 +41,13 @@ class _AuthScreenState extends State<AuthScreen> {
           } else if (state is AuthSuccess) {
             Provider.of<UserProvider>(context, listen: false)
                 .setUsername(_emailController.text);
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('isLoggedIn', true);
+            await prefs.setString('username', _emailController.text);
+            await prefs.setString('password', _passwordController.text);
+
             Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => const DataCaptureScreen()));
+                MaterialPageRoute(builder: (_) => const DashboardScreen()));
           }
         },
         builder: (context, state) {
@@ -106,7 +115,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     TextButton(
                       onPressed: () {
                         // navigate to Register Screen
-                        Navigator.of(context).pushReplacement(
+                        Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (_) => BlocProvider.value(
                               value: BlocProvider.of<AuthBloc>(context),
@@ -125,5 +134,18 @@ class _AuthScreenState extends State<AuthScreen> {
         },
       ),
     );
+  }
+}
+
+Future<bool> isUserLoggedIn() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('isLoggedIn') ?? false;
+}
+
+void checkLoginStatus(BuildContext context) async {
+  bool isLoggedIn = await isUserLoggedIn();
+  if (isLoggedIn) {
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const DashboardScreen()));
   }
 }

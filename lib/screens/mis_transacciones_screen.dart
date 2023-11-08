@@ -6,16 +6,23 @@ import 'package:serrato_water_app/bloc/sales_list/sales_event.dart';
 import 'package:serrato_water_app/bloc/sales_list/sales_state.dart';
 import 'package:serrato_water_app/models/sales_data.dart';
 import 'package:serrato_water_app/providers/user_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MisTransaccionesScreen extends StatelessWidget {
   const MisTransaccionesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var user = Provider.of<UserProvider>(context).username;
+    Future<String> userFuture = getUserName();
+
+    // define variable user
+    var user = Provider.of<UserProvider>(context, listen: false).username;
 
     Future<void> fetchData() async {
-      context.read<SalesBloc>().add(LoadSalesEvent(user));
+      userFuture.then((String userLocal) {
+        user = userLocal;
+        context.read<SalesBloc>().add(LoadSalesEvent(userLocal));
+      });
     }
 
     return Scaffold(
@@ -69,10 +76,16 @@ class MisTransaccionesScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.read<SalesBloc>().add(LoadSalesEvent(user)),
+        onPressed: () =>
+            context.read<SalesBloc>().add(LoadSalesEvent(user as String)),
         child: const Icon(Icons.refresh),
       ),
     );
+  }
+
+  Future<String> getUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('username') ?? '';
   }
 }
 

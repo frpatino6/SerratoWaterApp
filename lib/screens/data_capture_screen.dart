@@ -12,8 +12,6 @@ import 'package:serrato_water_app/bloc/credit_application/credit_application_blo
 import 'package:serrato_water_app/bloc/credit_application/credit_application_event.dart';
 import 'package:serrato_water_app/bloc/credit_application/credit_application_state.dart';
 import 'package:serrato_water_app/providers/user_provider.dart';
-import 'package:serrato_water_app/screens/auth_screen.dart';
-import 'package:serrato_water_app/screens/mis_transacciones_screen.dart';
 import 'package:flutter_signature_pad/flutter_signature_pad.dart';
 import 'package:serrato_water_app/widgets/addres_information.dart';
 import 'package:serrato_water_app/widgets/address_dialog.dart';
@@ -105,7 +103,8 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
       TextEditingController();
   final TextEditingController _forIDPurposesController =
       TextEditingController();
-  late MaskedTextController _creditCardExpirationDateController;
+  final TextEditingController _creditCardExpirationDateController =
+      TextEditingController();
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _timeAtResidenceController =
       TextEditingController();
@@ -250,9 +249,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const AuthScreen()),
-            );
+            Navigator.of(context).pop();
           },
         ),
         bottom: const PreferredSize(
@@ -264,17 +261,6 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
           ),
         ),
         actions: [
-          PopupMenuButton<String>(
-            onSelected: _handleMenuSelection,
-            itemBuilder: (BuildContext context) {
-              return {'My transactions'}.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          ),
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: () {
@@ -610,7 +596,8 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.blue,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 shape: RoundedRectangleBorder(
@@ -739,14 +726,6 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
 
       BlocProvider.of<CreditApplicationBloc>(context)
           .add(SaveCreditApplicationEvent(applicationData));
-    }
-  }
-
-  void _handleMenuSelection(String choice) {
-    if (choice == 'My transactions') {
-      // Aquí puedes navegar a la pantalla de "Mis Transacciones" o realizar cualquier otra acción que necesites.
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => const MisTransaccionesScreen()));
     }
   }
 

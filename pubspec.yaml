@@ -19,6 +19,7 @@ dependencies:
   flutter_multiselect: ^1.0.0
   flutter_masked_text2: ^0.9.1
   keyboard_dismisser: ^3.0.0
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

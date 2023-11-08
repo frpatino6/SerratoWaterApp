@@ -40,3 +40,5 @@ class LoadUserListEvent extends AuthEvent {
 
   const LoadUserListEvent(this.selectedUserType);
 }
+
+class LogoutEvent extends AuthEvent {}

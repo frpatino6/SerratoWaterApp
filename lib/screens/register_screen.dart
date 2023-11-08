@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:serrato_water_app/bloc/auth/auth_bloc.dart';
@@ -5,17 +7,31 @@ import 'package:serrato_water_app/bloc/auth/auth_event.dart';
 import 'package:serrato_water_app/bloc/auth/auth_state.dart';
 import 'package:serrato_water_app/screens/auth_screen.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
+  RegisterScreen({Key? key}) : super(key: key);
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _firstNameController = TextEditingController();
+
   final TextEditingController _lastNameController = TextEditingController();
+
   final TextEditingController _emailController = TextEditingController();
+
   final TextEditingController _passwordController = TextEditingController();
+
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+
   final _userTypeController = TextEditingController();
 
   String? _userType;
+
   String? _selectedUser;
 
   final List<String> _userTypes = [
@@ -24,7 +40,6 @@ class RegisterScreen extends StatelessWidget {
     'Corporate', // Corporativo
     'Installer', // Instalador
   ];
-  RegisterScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

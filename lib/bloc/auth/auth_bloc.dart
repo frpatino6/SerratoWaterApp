@@ -42,5 +42,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         yield AuthFailure(error.toString());
       }
     }
+    // En auth_bloc.dart, dentro de mapEventToState:
+    if (event is LogoutEvent) {
+      // Aquí llamarías al método que maneja el cierre de sesión en tu API
+
+      yield AuthInitial(); // Regresa al estado inicial que representa un usuario no autenticado.
+    }
   }
 }
