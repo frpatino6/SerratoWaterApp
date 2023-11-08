@@ -8,7 +8,7 @@ import 'package:serrato_water_app/bloc/auth/auth_state.dart';
 import 'package:serrato_water_app/screens/auth_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
-  RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();

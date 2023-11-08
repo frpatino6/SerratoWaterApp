@@ -77,7 +77,7 @@ class MisTransaccionesScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () =>
-            context.read<SalesBloc>().add(LoadSalesEvent(user as String)),
+            context.read<SalesBloc>().add(LoadSalesEvent(user)),
         child: const Icon(Icons.refresh),
       ),
     );

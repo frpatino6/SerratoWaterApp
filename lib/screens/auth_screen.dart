@@ -119,7 +119,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           MaterialPageRoute(
                             builder: (_) => BlocProvider.value(
                               value: BlocProvider.of<AuthBloc>(context),
-                              child: RegisterScreen(),
+                              child: const RegisterScreen(),
                             ),
                           ),
                         );

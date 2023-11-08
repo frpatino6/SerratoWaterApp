@@ -6,7 +6,6 @@ import 'dart:ui' as ui;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:provider/provider.dart';
 import 'package:serrato_water_app/bloc/credit_application/credit_application_bloc.dart';
 import 'package:serrato_water_app/bloc/credit_application/credit_application_event.dart';
@@ -272,7 +271,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.clear),
+            icon: const Icon(Icons.layers_clear_outlined),
             onPressed: () {
               _clearFormFields();
             },
