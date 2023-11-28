@@ -69,7 +69,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 10),
               buildTextField(
                   controller: _addressController, labelText: 'Address'),
-              buildTextField(controller: _phoneController, labelText: 'Phone'),
+              buildTextField(
+                  controller: _phoneController,
+                  labelText: 'Phone',
+                  acceptOnlyNumbers: true),
               const SizedBox(height: 10),
               buildTextField(controller: _emailController, labelText: 'Email'),
               const SizedBox(height: 10),
