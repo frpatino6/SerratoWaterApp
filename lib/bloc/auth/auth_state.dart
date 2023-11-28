@@ -27,3 +27,11 @@ class UserListLoadedState extends AuthState {
 
   const UserListLoadedState(this.userList);
 }
+
+class UserListLoadingState extends AuthState {
+  const UserListLoadingState();
+}
+
+class AuthRegisteringState extends AuthState {
+  const AuthRegisteringState();
+}

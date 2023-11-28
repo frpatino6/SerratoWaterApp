@@ -261,7 +261,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.save),
+            icon: const Icon(Icons.save_rounded),
             onPressed: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
@@ -393,7 +393,9 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                       final result = await showDialog<Map<String, dynamic>>(
                         context: context,
                         builder: (BuildContext context) {
-                          return const AddressInformation();
+                          return AddressInformation(
+                            stateList: _statesList,
+                          );
                         },
                       );
 
