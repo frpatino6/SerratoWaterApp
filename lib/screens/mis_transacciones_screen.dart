@@ -6,6 +6,7 @@ import 'package:serrato_water_app/bloc/sales_list/sales_event.dart';
 import 'package:serrato_water_app/bloc/sales_list/sales_state.dart';
 import 'package:serrato_water_app/models/sales_data.dart';
 import 'package:serrato_water_app/providers/user_provider.dart';
+import 'package:serrato_water_app/screens/update_application_status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MisTransaccionesScreen extends StatelessWidget {
@@ -120,6 +121,14 @@ class CustomListItem extends StatelessWidget {
         ),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 14.0),
+      onTap: () {
+        // Navegar a la pantalla de detalles
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => UpdateApplicationStatus(saleData: saleData),
+          ),
+        );
+      },
     );
   }
 }

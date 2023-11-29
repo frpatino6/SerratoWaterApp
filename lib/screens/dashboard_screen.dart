@@ -7,6 +7,7 @@ import 'package:serrato_water_app/screens/data_capture_screen.dart';
 import 'package:serrato_water_app/screens/mis_transacciones_screen.dart';
 import 'package:serrato_water_app/screens/profile_screen.dart';
 import 'package:serrato_water_app/screens/register_screen.dart';
+import 'package:serrato_water_app/screens/single_data_capture_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -172,6 +173,8 @@ class DashboardScreen extends StatelessWidget {
                   const Text('No', style: TextStyle(color: Colors.redAccent)),
               onPressed: () {
                 Navigator.pop(context);
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => const SingleDataCaptureScreen()));
               },
             ),
           ],

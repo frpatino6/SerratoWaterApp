@@ -16,7 +16,7 @@ class SaleData {
   String address;
   String state;
   String cityZipCode;
-  String installationAddressDifferent;
+  bool installationAddressDifferent;
   String monthlyMortgagePayment;
   String employerName;
   String employerPhoneNumber;
@@ -35,45 +35,45 @@ class SaleData {
   String installationCity;
   String installationState;
   String installationZipCode;
-
-  SaleData({
-    required this.applicantName,
-    required this.saleAmount,
-    required this.salesRepresentative,
-    required this.productsSold,
-    required this.applicantFirstName,
-    required this.applicantLastName,
-    required this.dateOfBirth,
-    required this.phoneNumber,
-    required this.email,
-    required this.socialSecurityNumber,
-    required this.idNumberDriverLicense,
-    required this.idIssueDate,
-    required this.expirationDate,
-    required this.timeAtResidence,
-    required this.address,
-    required this.state,
-    required this.cityZipCode,
-    required this.installationAddressDifferent,
-    required this.monthlyMortgagePayment,
-    required this.employerName,
-    required this.employerPhoneNumber,
-    required this.occupation,
-    required this.timeAtCurrentJob,
-    required this.employmentMonthlyIncome,
-    required this.otherIncome,
-    required this.sourceOfOtherIncome,
-    required this.forIDPurposes,
-    required this.creditCardExpirationDate,
-    required this.isACHInfoAdded,
-    required this.isIncomeNoticeChecked,
-    required this.isCoApplicantAdded,
-    required this.user,
-    required this.installationAddress,
-    required this.installationCity,
-    required this.installationState,
-    required this.installationZipCode,
-  });
+  String applicationState;
+  SaleData(
+      {required this.applicantName,
+      required this.saleAmount,
+      required this.salesRepresentative,
+      required this.productsSold,
+      required this.applicantFirstName,
+      required this.applicantLastName,
+      required this.dateOfBirth,
+      required this.phoneNumber,
+      required this.email,
+      required this.socialSecurityNumber,
+      required this.idNumberDriverLicense,
+      required this.idIssueDate,
+      required this.expirationDate,
+      required this.timeAtResidence,
+      required this.address,
+      required this.state,
+      required this.cityZipCode,
+      required this.installationAddressDifferent,
+      required this.monthlyMortgagePayment,
+      required this.employerName,
+      required this.employerPhoneNumber,
+      required this.occupation,
+      required this.timeAtCurrentJob,
+      required this.employmentMonthlyIncome,
+      required this.otherIncome,
+      required this.sourceOfOtherIncome,
+      required this.forIDPurposes,
+      required this.creditCardExpirationDate,
+      required this.isACHInfoAdded,
+      required this.isIncomeNoticeChecked,
+      required this.isCoApplicantAdded,
+      required this.user,
+      required this.installationAddress,
+      required this.installationCity,
+      required this.installationState,
+      required this.installationZipCode,
+      required this.applicationState});
 
   // Método para convertir un objeto SaleData a un mapa, útil para operaciones de base de datos
   Map<String, dynamic> toMap() {
@@ -155,6 +155,7 @@ class SaleData {
       installationCity: map['installationCity'] ?? '',
       installationState: map['installationState'] ?? '',
       installationZipCode: map['installationZipCode'] ?? '',
+      applicationState: map['applicationState'] ?? '',
     );
   }
 
@@ -204,6 +205,7 @@ class SaleData {
       installationCity: data['installationCity'] ?? '',
       installationState: data['installationState'] ?? '',
       installationZipCode: data['installationZipCode'] ?? '',
+      applicationState: data['applicationState'] ?? '',
     );
   }
 }

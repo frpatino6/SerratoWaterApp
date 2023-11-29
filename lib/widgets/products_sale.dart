@@ -3,8 +3,15 @@ import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 
 class ProductsDialog extends StatefulWidget {
   final Function(List<String>, String) onSubmit;
+  final List<String?> initialSelectedProducts;
+  final String initialCost;
 
-  const ProductsDialog({super.key, required this.onSubmit});
+  const ProductsDialog({
+    super.key,
+    required this.onSubmit,
+    required this.initialSelectedProducts,
+    required this.initialCost,
+  });
 
   @override
   _ProductsDialogState createState() => _ProductsDialogState();
@@ -29,8 +36,11 @@ class _ProductsDialogState extends State<ProductsDialog> {
     super.initState();
 
     for (var product in _products) {
-      _selectedProducts[product] = false;
+      _selectedProducts[product] =
+          widget.initialSelectedProducts.contains(product);
     }
+
+    _costController.text = widget.initialCost;
 
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {

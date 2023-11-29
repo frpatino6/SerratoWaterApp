@@ -1,9 +1,23 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
+import 'package:intl/intl.dart';
 
 class IdentificationInformation extends StatefulWidget {
-  const IdentificationInformation({Key? key}) : super(key: key);
+  final String initialIdNumberDriverLicense;
+  final DateTime? initialIdIssueDate;
+  final DateTime? initialExpirationDate;
+  final String initialForIDPurposes;
+  final String initialCreditCardExpirationDate;
+
+  const IdentificationInformation({
+    Key? key,
+    required this.initialIdNumberDriverLicense,
+    required this.initialIdIssueDate,
+    required this.initialExpirationDate,
+    required this.initialForIDPurposes,
+    required this.initialCreditCardExpirationDate,
+  }) : super(key: key);
 
   @override
   _IdentificationInformationState createState() =>
@@ -12,17 +26,15 @@ class IdentificationInformation extends StatefulWidget {
 
 class _IdentificationInformationState extends State<IdentificationInformation> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _idNumberDriverLicenseController =
+  TextEditingController _idNumberDriverLicenseController =
       TextEditingController();
-  final TextEditingController _idIssueDateController = TextEditingController();
-  final TextEditingController _expirationDateController =
-      TextEditingController();
+  TextEditingController _idIssueDateController = TextEditingController();
+  TextEditingController _expirationDateController = TextEditingController();
   late MaskedTextController _creditCardExpirationDateController;
   FilePickerResult? _file;
   String _idNumberDriverLicense = '';
-  DateTime _idIssueDate = DateTime.now();
-  DateTime _expirationDate = DateTime.now();
-  final String _state = '';
+  DateTime? _idIssueDate;
+  DateTime? _expirationDate;
   String _forIDPurposes = '';
   String _creditCardExpirationDate = '';
 
@@ -63,9 +75,26 @@ class _IdentificationInformationState extends State<IdentificationInformation> {
   @override
   void initState() {
     super.initState();
+    _idNumberDriverLicenseController =
+        TextEditingController(text: widget.initialIdNumberDriverLicense);
+
+    _idIssueDateController = TextEditingController(
+        text: widget.initialIdIssueDate != null
+            ? DateFormat('dd/MM/yyyy').format(widget.initialIdIssueDate!)
+            : '');
+
+    _expirationDateController = TextEditingController(
+        text: widget.initialExpirationDate != null
+            ? DateFormat('dd/MM/yyyy').format(widget.initialExpirationDate!)
+            : '');
+
     _creditCardExpirationDateController = MaskedTextController(
-        mask:
-            '00/00'); // Inicializar el controlador con la máscara deseada para MM/YY
+      mask: '00/00',
+      text: widget.initialCreditCardExpirationDate,
+    );
+    _forIDPurposes = widget.initialForIDPurposes;
+    _idIssueDate = widget.initialIdIssueDate;
+    _expirationDate = widget.initialExpirationDate;
   }
 
   @override
@@ -146,12 +175,12 @@ class _IdentificationInformationState extends State<IdentificationInformation> {
                 },
               ),
               DropdownButtonFormField(
-                value: _state.isEmpty
-                    ? null
-                    : _forIDPurposes, // Asigna el valor aquí
+                value: _idPurposesList.contains(_forIDPurposes)
+                    ? _forIDPurposes
+                    : null,
                 decoration: const InputDecoration(
                     labelText: 'Second Identification Method'),
-                items: _idPurposesList.map((String value) {
+                items: _idPurposesList.toSet().map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
