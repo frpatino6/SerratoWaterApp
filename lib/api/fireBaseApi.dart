@@ -14,7 +14,14 @@ class FirebaseAPI {
   }
 
   Future<Map<String, dynamic>> signUp(
-      String email, String password, String firstName, String lastName) async {
+      String email,
+      String password,
+      String userType,
+      String firstName,
+      String lastName,
+      String address,
+      String parentUser,
+      String phone) async {
     final String signUpUrl =
         'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey';
 
@@ -34,9 +41,8 @@ class FirebaseAPI {
 
     final responseData = json.decode(response.body);
     // save the user info
-    await postUserExtendInfo(email, password, firstName, lastName);
-    // disable the user
-    await disableUser(responseData['idToken']);
+    await postUserExtendInfo(email, password, userType, firstName, lastName,
+        address, parentUser, phone);
 
     return responseData;
   }
@@ -60,18 +66,58 @@ class FirebaseAPI {
   }
 
   Future<void> postUserExtendInfo(
-      String email, String password, String firstName, String lastName) async {
+      String email,
+      String password,
+      String userType,
+      String firstName,
+      String lastName,
+      String address,
+      String parentUser,
+      String phone) async {
     String url =
         'https://serratowaterapp-79627-default-rtdb.firebaseio.com/user_extend_info.json';
+
     final response = await http.post(
       Uri.parse(url),
-      body: json.encode(
-          {'email': email, 'firstName': firstName, 'lastName': lastName}),
+      body: json.encode({
+        'email': email,
+        'firstName': firstName,
+        'lastName': lastName,
+        'address': address,
+        'phone': phone,
+        'userType': userType,
+        'parent_user': parentUser,
+        'social_security': password
+      }),
       headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode != 200) {
       throw Exception('Failed to save application');
+    }
+  }
+
+  Future<void> putUserExtendInfo(String id, email, String firstName,
+      String lastName, String address, String phone) async {
+    // Asumiendo que 'userId' es el identificador único del usuario.
+    String nodeId = "-NdwgNZe1oXP6UvCm1_q";
+    String url =
+        'https://serratowaterapp-79627-default-rtdb.firebaseio.com/user_extend_info/$nodeId.json';
+
+    final response = await http.put(
+      Uri.parse(url),
+      body: json.encode({
+        'email': email,
+        'firstName': firstName,
+        'lastName': lastName,
+        'address': address,
+        'phone': phone
+      }),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update user information');
     }
   }
 
@@ -84,15 +130,39 @@ class FirebaseAPI {
       final Map<String, dynamic> data = jsonDecode(response.body);
       final List<String> userList = [];
 
-      data.forEach((key, value) {
-        if (value['userType'] == selectedUserType) {
-          userList.add(value['email']);
+      for (var entry in data.entries) {
+        if (entry.value['userType'] == selectedUserType) {
+          userList.add(entry.value['email']);
         }
-      });
+      }
 
       return userList;
     } else {
       throw Exception('Failed to load user list');
+    }
+  }
+
+  Future<Map<String, dynamic>?> getUserByEmail(String email) async {
+    final encodedEmail = Uri.encodeComponent(email);
+    final url = Uri.parse(
+        'https://serratowaterapp-79627-default-rtdb.firebaseio.com/user_extend_info.json?orderBy="email"&equalTo="$encodedEmail"');
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      // Si la respuesta no está vacía, devolvemos el primer usuario.
+      if (data.isNotEmpty) {
+        final firstKey = data.keys.first;
+        final user = data[firstKey];
+
+        user['id'] = firstKey;
+        return user;
+      }
+      // Si no hay datos, retornamos null para indicar que no se encontró ningún usuario.
+      return null;
+    } else {
+      throw Exception('Failed to load user');
     }
   }
 }

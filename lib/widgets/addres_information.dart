@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
 
 class AddressInformation extends StatefulWidget {
-  const AddressInformation({Key? key}) : super(key: key);
+  final List<String> stateList;
+  final String initialAddress;
+  final String initialCity;
+  final String initialState;
+  final String initialCityZipCode;
+  final String initialMonthlyMortgagePayment;
+  final String initialTimeAtResidence;
+
+  const AddressInformation({
+    Key? key,
+    required this.stateList,
+    required this.initialAddress,
+    required this.initialCity,
+    required this.initialState,
+    required this.initialCityZipCode,
+    required this.initialMonthlyMortgagePayment,
+    required this.initialTimeAtResidence,
+  }) : super(key: key);
 
   @override
   _AddressInformationState createState() => _AddressInformationState();
@@ -9,13 +26,12 @@ class AddressInformation extends StatefulWidget {
 
 class _AddressInformationState extends State<AddressInformation> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _cityZipCodeController = TextEditingController();
-  final TextEditingController _monthlyMortgagePaymentController =
+  TextEditingController _addressController = TextEditingController();
+  TextEditingController _cityController = TextEditingController();
+  TextEditingController _cityZipCodeController = TextEditingController();
+  TextEditingController _monthlyMortgagePaymentController =
       TextEditingController();
-  final TextEditingController _timeAtResidenceController =
-      TextEditingController();
+  TextEditingController _timeAtResidenceController = TextEditingController();
 
   String _address = '';
   String _city = '';
@@ -24,65 +40,26 @@ class _AddressInformationState extends State<AddressInformation> {
   String _monthlyMortgagePayment = '';
   int _timeAtResidence = 0;
 
-  final List<String> _statesList = [
-    "Alabama",
-    "Alaska",
-    "Arizona",
-    "Arkansas",
-    "California",
-    "Colorado",
-    "Connecticut",
-    "Delaware",
-    "Florida",
-    "Georgia",
-    "Hawaii",
-    "Idaho",
-    "Illinois",
-    "Indiana",
-    "Iowa",
-    "Kansas",
-    "Kentucky",
-    "Louisiana",
-    "Maine",
-    "Maryland",
-    "Massachusetts",
-    "Michigan",
-    "Minnesota",
-    "Mississippi",
-    "Missouri",
-    "Montana",
-    "Nebraska",
-    "Nevada",
-    "New Hampshire",
-    "New Jersey",
-    "New Mexico",
-    "New York",
-    "North Carolina",
-    "North Dakota",
-    "Ohio",
-    "Oklahoma",
-    "Oregon",
-    "Pennsylvania",
-    "Rhode Island",
-    "South Carolina",
-    "South Dakota",
-    "Tennessee",
-    "Texas",
-    "Utah",
-    "Vermont",
-    "Virginia",
-    "Washington",
-    "West Virginia",
-    "Wisconsin",
-    "Wyoming"
-  ];
-
   @override
   void dispose() {
     _addressController.dispose();
     _cityController.dispose();
     _cityZipCodeController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _addressController = TextEditingController(text: widget.initialAddress);
+    _cityController = TextEditingController(text: widget.initialCity);
+    _cityZipCodeController =
+        TextEditingController(text: widget.initialCityZipCode);
+    _monthlyMortgagePaymentController =
+        TextEditingController(text: widget.initialMonthlyMortgagePayment);
+    _timeAtResidenceController =
+        TextEditingController(text: widget.initialTimeAtResidence);
+    _state = widget.initialState;
   }
 
   void _submitForm() {
@@ -126,7 +103,8 @@ class _AddressInformationState extends State<AddressInformation> {
               ),
               DropdownButtonFormField(
                 decoration: const InputDecoration(labelText: 'State'),
-                items: _statesList.map((String value) {
+                value: _state == '' ? null : _state,
+                items: widget.stateList.map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),

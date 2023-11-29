@@ -1,7 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class PersonalInformationDialog extends StatefulWidget {
-  const PersonalInformationDialog({Key? key}) : super(key: key);
+  final String initialFirstName;
+  final String initialLastName;
+  final DateTime? initialDateOfBirth;
+  final String initialPhoneNumber;
+  final String initialEmail;
+  final String initialSocialSecurityNumber;
+
+  const PersonalInformationDialog({
+    super.key,
+    required this.initialFirstName,
+    required this.initialLastName,
+    required this.initialDateOfBirth,
+    required this.initialPhoneNumber,
+    required this.initialEmail,
+    required this.initialSocialSecurityNumber,
+  });
 
   @override
   _PersonalInformationDialogState createState() =>
@@ -10,16 +26,14 @@ class PersonalInformationDialog extends StatefulWidget {
 
 class _PersonalInformationDialogState extends State<PersonalInformationDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _applicantFirstNameController =
+  TextEditingController _applicantFirstNameController = TextEditingController();
+  TextEditingController _applicantLastNameController = TextEditingController();
+  TextEditingController _dateOfBirthController = TextEditingController();
+  TextEditingController _phoneNumberController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _socialSecurityNumberController =
       TextEditingController();
-  final TextEditingController _applicantLastNameController =
-      TextEditingController();
-  final TextEditingController _dateOfBirthController = TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _socialSecurityNumberController =
-      TextEditingController();
-  DateTime _dateOfBirth = DateTime.now();
+  DateTime? _dateOfBirth = DateTime.now();
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
@@ -35,6 +49,37 @@ class _PersonalInformationDialogState extends State<PersonalInformationDialog> {
 
       Navigator.of(context).pop(formData);
     }
+  }
+
+  @override
+  void dispose() {
+    _applicantFirstNameController.dispose();
+    _applicantLastNameController.dispose();
+    _dateOfBirthController.dispose();
+    _phoneNumberController.dispose();
+    _emailController.dispose();
+    _socialSecurityNumberController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _applicantFirstNameController =
+        TextEditingController(text: widget.initialFirstName);
+    _applicantLastNameController =
+        TextEditingController(text: widget.initialLastName);
+    _dateOfBirthController = TextEditingController(
+        text: widget.initialDateOfBirth != null
+            ? DateFormat('dd/MM/yyyy').format(widget.initialDateOfBirth!)
+            : '');
+    _phoneNumberController =
+        TextEditingController(text: widget.initialPhoneNumber);
+    _emailController = TextEditingController(text: widget.initialEmail);
+    _socialSecurityNumberController =
+        TextEditingController(text: widget.initialSocialSecurityNumber);
+
+    _dateOfBirth = widget.initialDateOfBirth;
   }
 
   @override

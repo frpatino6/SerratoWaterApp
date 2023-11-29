@@ -21,11 +21,12 @@ import 'package:serrato_water_app/widgets/personal_information.dart';
 import 'package:serrato_water_app/widgets/products_sale.dart';
 import 'package:serrato_water_app/widgets/work_information.dart';
 
-class DataCaptureScreen extends StatefulWidget {
-  const DataCaptureScreen({super.key});
+class SingleDataCaptureScreen extends StatefulWidget {
+  const SingleDataCaptureScreen({super.key});
 
   @override
-  _DataCaptureScreenState createState() => _DataCaptureScreenState();
+  _SingleDataCaptureScreenState createState() =>
+      _SingleDataCaptureScreenState();
 }
 
 class _WatermarkPaint extends CustomPainter {
@@ -57,7 +58,7 @@ class _WatermarkPaint extends CustomPainter {
   int get hashCode => price.hashCode ^ watermark.hashCode;
 }
 
-class _DataCaptureScreenState extends State<DataCaptureScreen> {
+class _SingleDataCaptureScreenState extends State<SingleDataCaptureScreen> {
   final _formKey = GlobalKey<FormState>();
   final _coApplicantFormKey = GlobalKey<FormState>();
   final _sign = GlobalKey<SignatureState>();
@@ -320,8 +321,8 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                         context: context,
                         builder: (context) {
                           return ProductsDialog(
-                            initialSelectedProducts: _selectedProducts,
                             initialCost: _saleAmountController.text,
+                            initialSelectedProducts: _selectedProducts,
                             onSubmit: (selectedProducts, cost) {
                               setState(() {
                                 _selectedProducts = selectedProducts;
@@ -363,11 +364,11 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      final DateTime? initialDate =
+                      final DateTime initialDate =
                           _dateOfBirthController.text.isNotEmpty
                               ? DateFormat('dd/MM/yyyy')
                                   .parse(_dateOfBirthController.text)
-                              : null;
+                              : DateTime.now();
                       final result = await showDialog<Map<String, dynamic>>(
                         context: context,
                         builder: (BuildContext context) =>
@@ -383,16 +384,10 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                       );
 
                       if (result != null) {
-                        DateTime dateOfBirth = result['dateOfBirth'];
-                        String formattedDate =
-                            DateFormat('dd/MM/yyyy').format(dateOfBirth);
                         _applicantFirstNameController.text =
                             result['firstName'];
-
-                        _dateOfBirth = dateOfBirth;
-
                         _applicantLastNameController.text = result['lastName'];
-                        _dateOfBirthController.text = formattedDate;
+                        _dateOfBirthController.text = result['dateOfBirth'];
                         _phoneNumberController.text = result['phoneNumber'];
                         _emailController.text = result['email'];
                         _socialSecurityNumberController.text =
@@ -480,20 +475,12 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                       );
 
                       if (result != null) {
-                        DateTime issueDate = result['idIssueDate'];
-                        String issueformattedDate =
-                            DateFormat('dd/MM/yyyy').format(issueDate);
-                        DateTime expirationDate = result['expirationDate'];
-                        String expirationformattedDate =
-                            DateFormat('dd/MM/yyyy').format(expirationDate);
-                        _idIssueDate = issueDate;
-                        _expirationDate = expirationDate;
-
                         _idNumberDriverLicenseController.text =
                             result['idNumberDriverLicense'];
-                        _idIssueDateController.text = issueformattedDate;
+                        _idIssueDateController.text =
+                            result['idIssueDate'].toString();
                         _expirationDateController.text =
-                            expirationformattedDate;
+                            result['expirationDate'].toString();
                         _forIDPurposesController.text = result['forIDPurposes'];
                         _creditCardExpirationDateController.text =
                             result['creditCardExpirationDate'];
@@ -515,19 +502,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                       final result = await showDialog<Map<String, dynamic>>(
                         context: context,
                         builder: (BuildContext context) {
-                          return WorkInformation(
-                            initialOccupation: _occupationController.text,
-                            initialEmployerName: _employerNameController.text,
-                            initialEmployerPhoneNumber:
-                                _employerPhoneNumberController.text,
-                            initialEmploymentMonthlyIncome:
-                                _employmentMonthlyIncomeController.text,
-                            initialOtherIncome: _otherIncomeController.text,
-                            initialSourceOfOtherIncome:
-                                _sourceOfOtherIncomeController.text,
-                            initialTimeAtCurrentJob:
-                                _timeAtCurrentJobController.text,
-                          );
+                          return const WorkInformation();
                         },
                       );
 
@@ -687,11 +662,14 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
 
   void handleSave(
       String installationAddress, String city, String state, String zipCode) {
+    // Aquí puedes manejar los datos ingresados en el diálogo.
+    // Por ejemplo, podrías almacenarlos en variables de instancia de la clase:
     _installationAddress = installationAddress;
     _installationCity = city;
     _installationState = state;
     _installationZipCode = zipCode;
 
+    // No olvides llamar a setState para actualizar la interfaz de usuario, si es necesario
     setState(() {});
   }
 
@@ -784,21 +762,11 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         "installationCity": _installationCity,
         "installationState": _installationState,
         "installationZipCode": _installationZipCode,
-        "date": DateTime.now().toIso8601String(),
+        "date": DateTime.now(),
         "bankName": _bankNameController.text,
         "accountHolder": _accountHolderController.text,
         "routingNumber": _routingNumberController.text,
         "accountNumber": _accountNumberController.text,
-        "city": _cityController.text,
-        "applicationState": "Send",
-        "creditCardExpirationDate": _creditCardExpirationDateController.text,
-        "timeAtResidence": int.parse(_timeAtResidenceController.text),
-        "installationAddressDifferent":
-            _installationAddressDifferentController.text.toLowerCase() ==
-                'true',
-        "coApplicantName": _coApplicantName,
-        "coApplicantDOB": _coApplicantDOB,
-        "coApplicantPhoneNumber": _coApplicantPhoneNumber,
       };
 
       BlocProvider.of<CreditApplicationBloc>(context)

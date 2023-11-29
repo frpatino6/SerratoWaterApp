@@ -46,8 +46,9 @@ class _AuthScreenState extends State<AuthScreen> {
             await prefs.setString('username', _emailController.text);
             await prefs.setString('password', _passwordController.text);
 
-            Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => const DashboardScreen()));
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (_) =>
+                    DashboardScreen(userName: _emailController.text)));
           }
         },
         builder: (context, state) {
@@ -111,21 +112,6 @@ class _AuthScreenState extends State<AuthScreen> {
                       ),
                       child: const Text('Login'),
                     ),
-                    const SizedBox(height: 20),
-                    TextButton(
-                      onPressed: () {
-                        // navigate to Register Screen
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => BlocProvider.value(
-                              value: BlocProvider.of<AuthBloc>(context),
-                              child: const RegisterScreen(),
-                            ),
-                          ),
-                        );
-                      },
-                      child: const Text('Register'),
-                    ),
                   ],
                 ),
               ),
@@ -142,10 +128,19 @@ Future<bool> isUserLoggedIn() async {
   return prefs.getBool('isLoggedIn') ?? false;
 }
 
+Future<String> getUserName() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('username') ?? '';
+}
+
 void checkLoginStatus(BuildContext context) async {
   bool isLoggedIn = await isUserLoggedIn();
   if (isLoggedIn) {
-    Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const DashboardScreen()));
+    String user = await getUserName();
+
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (_) => DashboardScreen(
+              userName: user,
+            )));
   }
 }

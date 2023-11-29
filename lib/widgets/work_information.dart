@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
 
 class WorkInformation extends StatefulWidget {
-  const WorkInformation({Key? key}) : super(key: key);
+  final String initialOccupation;
+  final String initialEmployerName;
+  final String initialEmployerPhoneNumber;
+  final String initialEmploymentMonthlyIncome;
+  final String initialOtherIncome;
+  final String initialSourceOfOtherIncome;
+  final String initialTimeAtCurrentJob;
+
+  const WorkInformation({
+    Key? key,
+    this.initialOccupation = '',
+    this.initialEmployerName = '',
+    this.initialEmployerPhoneNumber = '',
+    this.initialEmploymentMonthlyIncome = '',
+    this.initialOtherIncome = '',
+    this.initialSourceOfOtherIncome = '',
+    this.initialTimeAtCurrentJob = '',
+  }) : super(key: key);
 
   @override
   _WorkInformationState createState() => _WorkInformationState();
@@ -9,17 +26,16 @@ class WorkInformation extends StatefulWidget {
 
 class _WorkInformationState extends State<WorkInformation> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _occupationController = TextEditingController();
-  final TextEditingController _employerNameController = TextEditingController();
-  final TextEditingController _employerPhoneNumberController =
+  TextEditingController _occupationController = TextEditingController();
+  TextEditingController _employerNameController = TextEditingController();
+  TextEditingController _employerPhoneNumberController =
       TextEditingController();
-  final TextEditingController _employmentMonthlyIncomeController =
+  TextEditingController _employmentMonthlyIncomeController =
       TextEditingController();
-  final TextEditingController _otherIncomeController = TextEditingController();
-  final TextEditingController _sourceOfOtherIncomeController =
+  TextEditingController _otherIncomeController = TextEditingController();
+  TextEditingController _sourceOfOtherIncomeController =
       TextEditingController();
-  final TextEditingController _timeAtCurrentJobController =
-      TextEditingController();
+  TextEditingController _timeAtCurrentJobController = TextEditingController();
 
   // Variables para guardar los valores cuando se guarda el formulario
   String _occupation = '';
@@ -29,6 +45,25 @@ class _WorkInformationState extends State<WorkInformation> {
   String _otherIncome = '';
   String _sourceOfOtherIncome = '';
   String _timeAtCurrentJob = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _occupationController =
+        TextEditingController(text: widget.initialOccupation);
+    _employerNameController =
+        TextEditingController(text: widget.initialEmployerName);
+    _employerPhoneNumberController =
+        TextEditingController(text: widget.initialEmployerPhoneNumber);
+    _employmentMonthlyIncomeController =
+        TextEditingController(text: widget.initialEmploymentMonthlyIncome);
+    _otherIncomeController =
+        TextEditingController(text: widget.initialOtherIncome);
+    _sourceOfOtherIncomeController =
+        TextEditingController(text: widget.initialSourceOfOtherIncome);
+    _timeAtCurrentJobController =
+        TextEditingController(text: widget.initialTimeAtCurrentJob);
+  }
 
   // Un método de validación genérico que puedes personalizar según tus necesidades
   String? _validateInput(String? value) {
@@ -97,6 +132,7 @@ class _WorkInformationState extends State<WorkInformation> {
                 decoration:
                     const InputDecoration(labelText: 'Time at Current Job'),
                 onSaved: (value) => _timeAtCurrentJob = value!,
+                keyboardType: TextInputType.number,
                 validator: _validateInput,
               ),
               TextFormField(

@@ -5,10 +5,14 @@ import 'package:serrato_water_app/bloc/auth/auth_event.dart';
 import 'package:serrato_water_app/screens/auth_screen.dart';
 import 'package:serrato_water_app/screens/data_capture_screen.dart';
 import 'package:serrato_water_app/screens/mis_transacciones_screen.dart';
+import 'package:serrato_water_app/screens/profile_screen.dart';
+import 'package:serrato_water_app/screens/register_screen.dart';
+import 'package:serrato_water_app/screens/single_data_capture_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  final String userName;
+  const DashboardScreen({super.key, required this.userName});
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +81,7 @@ class DashboardScreen extends StatelessWidget {
             flex: 1,
             child: InkWell(
               onTap: () {
-                // Navigate to Settings screen
+                _onViewProfile(context);
               },
               child: const Card(
                 margin: EdgeInsets.all(8.0),
@@ -86,8 +90,31 @@ class DashboardScreen extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Icon(Icons.settings, size: 50.0),
-                      Text('Settings', style: TextStyle(fontSize: 20)),
+                      Icon(Icons.account_circle, size: 50.0),
+                      Text('Profile', style: TextStyle(fontSize: 20)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: InkWell(
+              onTap: () {
+                _onViewUserRegister(context);
+              },
+              child: const Card(
+                margin: EdgeInsets.all(8.0),
+                color: Colors
+                    .lightBlueAccent, // Cambiado a un color que sugiera una acción de 'crear' o 'añadir'
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Icon(Icons.person_add,
+                          size: 50.0), // Icono para 'añadir persona'
+                      Text('Create User', style: TextStyle(fontSize: 20)),
                     ],
                   ),
                 ),
@@ -103,6 +130,20 @@ class DashboardScreen extends StatelessWidget {
     // Aquí va el código para navegar a la pantalla de transacciones
     Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const MisTransaccionesScreen()));
+  }
+
+  void _onViewProfile(BuildContext context) {
+    // Aquí va el código para navegar a la pantalla de transacciones
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => ProfileScreen(
+              userName: userName,
+            )));
+  }
+
+  void _onViewUserRegister(BuildContext context) {
+    // Aquí va el código para navegar a la pantalla de transacciones
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const RegisterScreen()));
   }
 
   void _showFinancingQuestion(BuildContext context) {
@@ -132,6 +173,8 @@ class DashboardScreen extends StatelessWidget {
                   const Text('No', style: TextStyle(color: Colors.redAccent)),
               onPressed: () {
                 Navigator.pop(context);
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => const SingleDataCaptureScreen()));
               },
             ),
           ],
