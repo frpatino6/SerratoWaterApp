@@ -22,7 +22,8 @@ import 'package:serrato_water_app/widgets/products_sale.dart';
 import 'package:serrato_water_app/widgets/work_information.dart';
 
 class DataCaptureScreen extends StatefulWidget {
-  const DataCaptureScreen({super.key});
+  final String userName;
+  const DataCaptureScreen({super.key, required this.userName});
 
   @override
   _DataCaptureScreenState createState() => _DataCaptureScreenState();
@@ -267,7 +268,6 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
                 _submitForm();
-                // Aquí puedes procesar y guardar los datos del formulario.
               }
             },
           ),
@@ -296,6 +296,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                   actions: [
                     TextButton(
                       onPressed: () {
+                        Navigator.of(context).pop(); // Cierra el AlertDialog
                         Navigator.of(context).pop();
                       },
                       child: const Text('OK'),
@@ -308,6 +309,10 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
           }
         },
         builder: (context, state) {
+          if (state is CreditApplicationLoading) {
+            // Retorna el CircularProgressIndicator directamente
+            return const Center(child: CircularProgressIndicator());
+          }
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Form(
@@ -762,7 +767,6 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         "idNumberDriverLicense": _idNumberDriverLicenseController.text,
         "idIssueDate": _idIssueDate.toIso8601String(),
         "expirationDate": _expirationDate.toIso8601String(),
-        "timeAtResidence": _timeAtResidence,
         "address": _addressController.text,
         "state": _state,
         "cityZipCode": _cityZipCodeController.text,
@@ -779,7 +783,6 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         "isACHInfoAdded": _isACHInfoAdded,
         "isIncomeNoticeChecked": _isIncomeNoticeChecked,
         "isCoApplicantAdded": _isCoApplicantAdded,
-        "userOwner": _user,
         "installationAddress": _installationAddress,
         "installationCity": _installationCity,
         "installationState": _installationState,
@@ -791,11 +794,9 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         "accountNumber": _accountNumberController.text,
         "city": _cityController.text,
         "applicationState": "Send",
+        "userOwner": widget.userName,
         "creditCardExpirationDate": _creditCardExpirationDateController.text,
         "timeAtResidence": int.parse(_timeAtResidenceController.text),
-        "installationAddressDifferent":
-            _installationAddressDifferentController.text.toLowerCase() ==
-                'true',
         "coApplicantName": _coApplicantName,
         "coApplicantDOB": _coApplicantDOB,
         "coApplicantPhoneNumber": _coApplicantPhoneNumber,
