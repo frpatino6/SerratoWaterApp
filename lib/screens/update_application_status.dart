@@ -21,6 +21,19 @@ class UpdateApplicationStatus extends StatelessWidget {
       color: Colors.black54,
     );
 
+    List<String> statusOptions = [
+      "Submitted",
+      "Under Review",
+      "Declined or Approved",
+      "Documents Sent",
+      "Pending Installation",
+      "Installed",
+      "Pending Verification",
+      "Verified",
+      "In Payment Process",
+      "Paid"
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Application Details'),
@@ -28,7 +41,6 @@ class UpdateApplicationStatus extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
-          // Usar ListView para evitar problemas de desbordamiento
           children: [
             Text('Applicant Name:', style: headingStyle),
             Text(saleData.applicantName, style: contentStyle),
@@ -36,13 +48,35 @@ class UpdateApplicationStatus extends StatelessWidget {
             Text('Address:', style: headingStyle),
             Text(saleData.address, style: contentStyle),
             const SizedBox(height: 16),
+            Text('Status:', style: headingStyle),
+            DropdownButtonFormField<String>(
+              value: statusOptions.contains(saleData.applicationState)
+                  ? saleData.applicationState
+                  : null,
+              items:
+                  statusOptions.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                // Aquí puedes manejar el cambio de estado si es necesario
+              },
+            ),
+            const SizedBox(height: 16),
             Text('Product List', style: headingStyle),
-            ...products
-                .map((product) => Padding(
-                      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                      child: Text(product, style: contentStyle),
-                    ))
-                .toList(),
+            const SizedBox(height: 8),
+            ...products.map((product) {
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 4.0),
+                child: ListTile(
+                  leading: const Icon(Icons.check_circle_outline,
+                      color: Colors.blue),
+                  title: Text(product, style: contentStyle),
+                ),
+              );
+            }).toList(),
           ],
         ),
       ),

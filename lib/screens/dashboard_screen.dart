@@ -174,7 +174,8 @@ class DashboardScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => const SingleDataCaptureScreen()));
+                    builder: (_) =>
+                        SingleDataCaptureScreen(userName: userName)));
               },
             ),
           ],

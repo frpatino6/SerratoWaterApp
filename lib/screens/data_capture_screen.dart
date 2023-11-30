@@ -793,7 +793,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         "routingNumber": _routingNumberController.text,
         "accountNumber": _accountNumberController.text,
         "city": _cityController.text,
-        "applicationState": "Send",
+        "applicationState": "Submitted",
         "userOwner": widget.userName,
         "creditCardExpirationDate": _creditCardExpirationDateController.text,
         "timeAtResidence": int.parse(_timeAtResidenceController.text),
