@@ -16,11 +16,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onLoginEvent(LoginEvent event, Emitter<AuthState> emit) async {
     try {
       final result = await api.signIn(event.email, event.password);
-      if (result.containsKey('error')) {
-        emit(AuthFailure(result['error']['message']));
-      } else {
-        emit(AuthSuccess());
-      }
+
+      emit(AuthSuccess(result));
     } catch (error) {
       emit(AuthFailure(error.toString()));
     }
@@ -42,7 +39,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (result.containsKey('error')) {
         emit(AuthFailure(result['error']['message']));
       } else {
-        emit(AuthSuccess());
+        emit(AuthSuccess(result));
       }
     } catch (error) {
       emit(AuthFailure(error.toString()));

@@ -9,9 +9,16 @@ import 'package:serrato_water_app/providers/user_provider.dart';
 import 'package:serrato_water_app/screens/update_application_status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class MisTransaccionesScreen extends StatelessWidget {
-  const MisTransaccionesScreen({super.key});
+class MisTransaccionesScreen extends StatefulWidget {
+  final String userType;
 
+  const MisTransaccionesScreen({super.key, required this.userType});
+
+  @override
+  State<MisTransaccionesScreen> createState() => _MisTransaccionesScreenState();
+}
+
+class _MisTransaccionesScreenState extends State<MisTransaccionesScreen> {
   @override
   Widget build(BuildContext context) {
     Future<String> userFuture = getUserName();
@@ -61,7 +68,8 @@ class MisTransaccionesScreen extends StatelessWidget {
                     itemCount: state.salesData.length,
                     itemBuilder: (context, index) {
                       SaleData data = state.salesData[index];
-                      return CustomListItem(saleData: data);
+                      return CustomListItem(
+                          saleData: data, userType: widget.userType);
                     },
                     separatorBuilder: (context, index) => const Divider(),
                   );
@@ -91,8 +99,10 @@ class MisTransaccionesScreen extends StatelessWidget {
 
 class CustomListItem extends StatelessWidget {
   final SaleData saleData;
+  final String userType;
 
-  const CustomListItem({super.key, required this.saleData});
+  const CustomListItem(
+      {super.key, required this.saleData, required this.userType});
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +130,9 @@ class CustomListItem extends StatelessWidget {
           style: const TextStyle(color: Colors.black54),
         ),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 14.0),
+      trailing: userType == 'SuperAdministrator'
+          ? const Icon(Icons.arrow_forward_ios, size: 14.0)
+          : null,
       onTap: () {
         // Navegar a la pantalla de detalles
         Navigator.of(context).push(

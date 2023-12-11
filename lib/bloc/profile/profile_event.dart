@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 abstract class ProfileEvent {}
 
 class LoadUserProfile extends ProfileEvent {

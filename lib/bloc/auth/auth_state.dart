@@ -11,7 +11,11 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {} // Aquí está el nuevo estado AuthLoading.
 
-class AuthSuccess extends AuthState {}
+class AuthSuccess extends AuthState {
+  final Map<String, dynamic>? userProfile;
+
+  const AuthSuccess(this.userProfile);
+}
 
 class AuthFailure extends AuthState {
   final String error;
