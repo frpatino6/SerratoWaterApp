@@ -126,7 +126,7 @@ class _SingleDataCaptureScreenState extends State<SingleDataCaptureScreen> {
                     spacing: 8, // Espacio entre los Chips
                     children: _selectedProducts
                         .map((product) => Chip(
-                              label: Text(product!),
+                              label: Text(product),
                               backgroundColor: Colors.blue,
                               labelStyle: const TextStyle(color: Colors.white),
                               deleteIcon:

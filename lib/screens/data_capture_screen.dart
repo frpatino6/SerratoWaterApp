@@ -13,6 +13,7 @@ import 'package:serrato_water_app/bloc/credit_application/credit_application_eve
 import 'package:serrato_water_app/bloc/credit_application/credit_application_state.dart';
 import 'package:serrato_water_app/providers/user_provider.dart';
 import 'package:flutter_signature_pad/flutter_signature_pad.dart';
+import 'package:serrato_water_app/screens/co_applicant_form.dart';
 import 'package:serrato_water_app/widgets/addres_information.dart';
 import 'package:serrato_water_app/widgets/address_dialog.dart';
 import 'package:serrato_water_app/widgets/bank_detail.dart';
@@ -267,7 +268,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
             onPressed: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                _submitForm();
+                _showAddCoApplicantDialog();
               }
             },
           ),
@@ -845,6 +846,46 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
       }
     }
     return null;
+  }
+
+  void _validateAndSubmitForm() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      _submitForm();
+    }
+  }
+
+  void _showAddCoApplicantDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Add Co-Applicant"),
+          content: const Text("Do you want to add a co-applicant?"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _validateAndSubmitForm();
+              },
+            ),
+            TextButton(
+              child: const Text("Yes"),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                final coApplicantData = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CoApplicantForm()),
+                );
+                // Aquí manejas los datos retornados, si los hay
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _clearFormFields() {
