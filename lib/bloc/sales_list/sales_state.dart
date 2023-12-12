@@ -19,3 +19,10 @@ class SalesError extends SalesState {
 
   SalesError(this.message);
 }
+
+// add state updating sales status
+class SalesStatusUpdated extends SalesState {
+  final String message;
+
+  SalesStatusUpdated(this.message);
+}

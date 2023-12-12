@@ -6,7 +6,6 @@ import 'package:serrato_water_app/bloc/auth/auth_event.dart';
 import 'package:serrato_water_app/bloc/auth/auth_state.dart';
 import 'package:serrato_water_app/providers/user_provider.dart';
 import 'package:serrato_water_app/screens/dashboard_screen.dart';
-import 'package:serrato_water_app/screens/register_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -45,10 +44,15 @@ class _AuthScreenState extends State<AuthScreen> {
             await prefs.setBool('isLoggedIn', true);
             await prefs.setString('username', _emailController.text);
             await prefs.setString('password', _passwordController.text);
+            await prefs.setString('userType', state.userProfile!['userType']);
 
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (_) =>
-                    DashboardScreen(userName: _emailController.text)));
+            if (context.mounted) {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (_) => DashboardScreen(
+                        userName: _emailController.text,
+                        userType: state.userProfile!['userType'],
+                      )));
+            }
           }
         },
         builder: (context, state) {
@@ -133,14 +137,22 @@ Future<String> getUserName() async {
   return prefs.getString('username') ?? '';
 }
 
+Future<String> getUserType() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('userType') ?? '';
+}
+
 void checkLoginStatus(BuildContext context) async {
   bool isLoggedIn = await isUserLoggedIn();
   if (isLoggedIn) {
     String user = await getUserName();
-
-    Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (_) => DashboardScreen(
-              userName: user,
-            )));
+    String userType = await getUserType();
+    if (context.mounted) {
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (_) => DashboardScreen(
+                userName: user,
+                userType: userType,
+              )));
+    }
   }
 }

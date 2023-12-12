@@ -39,4 +39,22 @@ class CreditApplicationApi {
       throw Exception('Failed to load sales data');
     }
   }
+
+  // add method to update sales status
+  Future<String> updateSalesStatus(String salesId, String status) async {
+    String url =
+        'https://serratowaterapp-79627-default-rtdb.firebaseio.com/credit_application/$salesId.json';
+
+    final response = await http.patch(
+      Uri.parse(url),
+      body: json.encode({'status': status}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update sales status');
+    }
+
+    return 'Sales status updated';
+  }
 }

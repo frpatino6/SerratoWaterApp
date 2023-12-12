@@ -4,13 +4,21 @@ import 'dart:convert';
 class FirebaseAPI {
   final String apiKey = "AIzaSyAlknAEEg2EroaQvYh9dPNM3Kda80CITvU";
 
-  Future<Map<String, dynamic>> signIn(String email, String password) async {
+  Future<Map<String, dynamic>?> signIn(String email, String password) async {
     final String url =
         'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=$apiKey';
     final response = await http.post(Uri.parse(url), // Modificación aquí
         body: json.encode(
             {'email': email, 'password': password, 'returnSecureToken': true}));
-    return json.decode(response.body);
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to login');
+    } else {
+      final responseData = json.decode(response.body);
+      final String email = responseData['email'];
+      final resultUser = await getUserByEmail(email);
+      return resultUser;
+    }
   }
 
   Future<Map<String, dynamic>> signUp(

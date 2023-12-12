@@ -12,7 +12,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatelessWidget {
   final String userName;
-  const DashboardScreen({super.key, required this.userName});
+  final String userType;
+  const DashboardScreen(
+      {super.key, required this.userName, required this.userType});
 
   @override
   Widget build(BuildContext context) {
@@ -21,16 +23,17 @@ class DashboardScreen extends StatelessWidget {
         title: const Text('Dashboard'),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.logout_sharp),
-            onPressed: () async {
-              BlocProvider.of<AuthBloc>(context).add(LogoutEvent());
+              icon: const Icon(Icons.logout_sharp),
+              onPressed: () async {
+                BlocProvider.of<AuthBloc>(context).add(LogoutEvent());
 
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setBool('isLoggedIn', false);
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const AuthScreen()));
-            },
-          )
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('isLoggedIn', false);
+                if (context.mounted) {
+                  Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (_) => const AuthScreen()));
+                }
+              })
         ],
       ),
       body: Column(
@@ -98,29 +101,30 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
-            flex: 1,
-            child: InkWell(
-              onTap: () {
-                _onViewUserRegister(context);
-              },
-              child: const Card(
-                margin: EdgeInsets.all(8.0),
-                color: Colors
-                    .lightBlueAccent, // Cambiado a un color que sugiera una acción de 'crear' o 'añadir'
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Icon(Icons.person_add,
-                          size: 50.0), // Icono para 'añadir persona'
-                      Text('Create User', style: TextStyle(fontSize: 20)),
-                    ],
+          if (userType == 'SuperAdministrator')
+            Expanded(
+              flex: 1,
+              child: InkWell(
+                onTap: () {
+                  _onViewUserRegister(context);
+                },
+                child: const Card(
+                  margin: EdgeInsets.all(8.0),
+                  color: Colors
+                      .lightBlueAccent, // Cambiado a un color que sugiera una acción de 'crear' o 'añadir'
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(Icons.person_add,
+                            size: 50.0), // Icono para 'añadir persona'
+                        Text('Create User', style: TextStyle(fontSize: 20)),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -128,8 +132,10 @@ class DashboardScreen extends StatelessWidget {
 
   void _onViewTransactions(BuildContext context) {
     // Aquí va el código para navegar a la pantalla de transacciones
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const MisTransaccionesScreen()));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => MisTransaccionesScreen(
+              userType: userType,
+            )));
   }
 
   void _onViewProfile(BuildContext context) {
