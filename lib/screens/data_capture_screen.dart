@@ -118,6 +118,52 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   final TextEditingController _accountNumberController =
       TextEditingController();
 
+  final TextEditingController _coApplicationFirsNameController =
+      TextEditingController();
+
+  final TextEditingController _coApplicationLastNameController =
+      TextEditingController();
+  final TextEditingController _coApplicationPhoneNumberController =
+      TextEditingController();
+  final TextEditingController _coApplicationEmailController =
+      TextEditingController();
+  final TextEditingController _coApplicationSSNController =
+      TextEditingController();
+  final TextEditingController _coApplicationIDNumberController =
+      TextEditingController();
+  final TextEditingController _coApplicationExpirationDateController =
+      TextEditingController();
+  final TextEditingController _coApplicationResidenceDurationController =
+      TextEditingController();
+  final TextEditingController _coApplicationAddressController =
+      TextEditingController();
+  final TextEditingController _coApplicationCityController =
+      TextEditingController();
+  final TextEditingController _coApplicationStateController =
+      TextEditingController();
+  final TextEditingController _coApplicationZipCodeController =
+      TextEditingController();
+  final TextEditingController _coApplicationMortgagePaymentController =
+      TextEditingController();
+  final TextEditingController _coApplicationEmployerNameController =
+      TextEditingController();
+  final TextEditingController _coApplicationEmployerPhoneNumberController =
+      TextEditingController();
+  final TextEditingController _coApplicationOccupationController =
+      TextEditingController();
+  final TextEditingController _coApplicationJobDurationController =
+      TextEditingController();
+  final TextEditingController _coApplicationMonthlyIncomeController =
+      TextEditingController();
+  final TextEditingController _coApplicationOtherIncomeController =
+      TextEditingController();
+  final TextEditingController _coApplicationOtherIncomeSourceController =
+      TextEditingController();
+  final TextEditingController _coApplicationIDPurposeController =
+      TextEditingController();
+  final TextEditingController _coApplicationCreditCardExpirationController =
+      TextEditingController();
+
   final String _saleAmount = '';
   final String _hardness = '';
   final String _salesRepresentative = '';
@@ -879,6 +925,50 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                   MaterialPageRoute(
                       builder: (context) => const CoApplicantForm()),
                 );
+
+                _coApplicationFirsNameController.text =
+                    coApplicantData['firstName'];
+                _coApplicationLastNameController.text =
+                    coApplicantData['lastName'];
+                _coApplicationPhoneNumberController.text =
+                    coApplicantData['phoneNumber'];
+                _coApplicationEmailController.text = coApplicantData['email'];
+                _coApplicationSSNController.text =
+                    coApplicantData['socialSecurityNumber'];
+                _coApplicationIDNumberController.text =
+                    coApplicantData['idNumberDriverLicense'];
+                _coApplicationExpirationDateController.text =
+                    coApplicantData['expirationDate'];
+                _coApplicationResidenceDurationController.text =
+                    coApplicantData['timeAtResidence'];
+                _coApplicationAddressController.text =
+                    coApplicantData['address'];
+                _coApplicationCityController.text = coApplicantData['city'];
+                _coApplicationStateController.text = coApplicantData['state'];
+                _coApplicationZipCodeController.text =
+                    coApplicantData['zipCode'];
+                _coApplicationMortgagePaymentController.text =
+                    coApplicantData['monthlyMortgagePayment'];
+                _coApplicationEmployerNameController.text =
+                    coApplicantData['employerName'];
+                _coApplicationEmployerPhoneNumberController.text =
+                    coApplicantData['employerPhoneNumber'];
+                _coApplicationOccupationController.text =
+                    coApplicantData['occupation'];
+                _coApplicationJobDurationController.text =
+                    coApplicantData['timeAtCurrentJob'];
+                _coApplicationMonthlyIncomeController.text =
+                    coApplicantData['employmentMonthlyIncome'];
+                _coApplicationOtherIncomeController.text =
+                    coApplicantData['otherIncome'];
+                _coApplicationOtherIncomeSourceController.text =
+                    coApplicantData['sourceOfOtherIncome'];
+                _coApplicationIDPurposeController.text =
+                    coApplicantData['forIDPurposes'];
+                _coApplicationCreditCardExpirationController.text =
+                    coApplicantData['creditCardExpirationDate'];
+                _isCoApplicantAdded = true;
+
                 // Aquí manejas los datos retornados, si los hay
               },
             ),
