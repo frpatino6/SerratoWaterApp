@@ -119,13 +119,17 @@ class CustomListItem extends StatelessWidget {
         text: TextSpan(
           children: [
             const TextSpan(
-                text: 'Applicant name: ',
+                text: 'Customer name: ',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             TextSpan(text: '${saleData.applicantName}\n'),
             const TextSpan(
                 text: 'Address: ',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             TextSpan(text: '${saleData.address}\n'),
+            const TextSpan(
+                text: 'Status: ',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            TextSpan(text: '${saleData.applicationState}\n'),
           ],
           style: const TextStyle(color: Colors.black54),
         ),

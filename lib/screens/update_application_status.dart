@@ -24,19 +24,24 @@ class UpdateApplicationStatus extends StatelessWidget {
     List<String> statusOptions = [
       "Submitted",
       "Under Review",
-      "Declined or Approved",
-      "Documents Sent",
+      "Declined",
+      "Approved",
       "Pending Installation",
       "Installed",
       "Pending Verification",
-      "Verified",
-      "In Payment Process",
-      "Paid"
+      "Funding Process",
+      "Completed",
     ];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Application Details'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -60,9 +65,7 @@ class UpdateApplicationStatus extends StatelessWidget {
                   child: Text(value),
                 );
               }).toList(),
-              onChanged: (String? newValue) {
-                // Aquí puedes manejar el cambio de estado si es necesario
-              },
+              onChanged: (String? newValue) {},
             ),
             const SizedBox(height: 16),
             Text('Product List', style: headingStyle),

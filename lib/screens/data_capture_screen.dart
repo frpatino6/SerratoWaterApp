@@ -223,7 +223,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
     "Well Water System",
     "MM7000",
     "Alkaline Stage",
-    "5 Years soaps"
+    "5 Years Soaps"
   ];
   List<String?> _selectedProducts = [];
   String? _selectedProduct;
@@ -393,7 +393,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                         borderRadius: BorderRadius.all(Radius.circular(2)),
                       ),
                     ),
-                    child: const Text('Products Sale'),
+                    child: const Text('Products'),
                   ),
                   const SizedBox(height: 10),
                   Wrap(

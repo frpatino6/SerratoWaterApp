@@ -67,7 +67,8 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       TextFormField(
                         controller: surnameController,
-                        decoration: const InputDecoration(labelText: 'Surname'),
+                        decoration:
+                            const InputDecoration(labelText: 'Last Name'),
                       ),
                       TextFormField(
                         controller: phoneController,

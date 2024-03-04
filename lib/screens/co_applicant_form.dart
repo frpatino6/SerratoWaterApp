@@ -53,10 +53,6 @@ class _CoApplicantFormState extends State<CoApplicantForm> {
   final TextEditingController _timeAtCurrentJobController =
       TextEditingController();
 
-  DateTime _dateOfBirth = DateTime.now();
-  DateTime _idIssueDate = DateTime.now();
-  DateTime _expirationDate = DateTime.now();
-
   final List<String> _statesList = [
     "Alabama",
     "Alaska",
@@ -148,8 +144,6 @@ class _CoApplicantFormState extends State<CoApplicantForm> {
                     String formattedDate =
                         DateFormat('dd/MM/yyyy').format(dateOfBirth);
                     _applicantFirstNameController.text = result['firstName'];
-
-                    _dateOfBirth = dateOfBirth;
 
                     _applicantLastNameController.text = result['lastName'];
                     _dateOfBirthController.text = formattedDate;
@@ -244,8 +238,6 @@ class _CoApplicantFormState extends State<CoApplicantForm> {
                     DateTime expirationDate = result['expirationDate'];
                     String expirationformattedDate =
                         DateFormat('dd/MM/yyyy').format(expirationDate);
-                    _idIssueDate = issueDate;
-                    _expirationDate = expirationDate;
 
                     _idNumberDriverLicenseController.text =
                         result['idNumberDriverLicense'];

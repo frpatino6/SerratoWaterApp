@@ -23,7 +23,7 @@ class _ProductsDialogState extends State<ProductsDialog> {
     "Well Water System",
     "MM7000",
     "Alkaline Stage",
-    "5 Years soaps"
+    "5 Years Soaps"
   ];
   final Map<String, bool> _selectedProducts = {};
   final TextEditingController _costController = TextEditingController();
@@ -64,7 +64,7 @@ class _ProductsDialogState extends State<ProductsDialog> {
     return KeyboardDismisser(
       gestures: const [GestureType.onVerticalDragDown],
       child: AlertDialog(
-        title: const Text('Select Products and Enter Cost'),
+        title: const Text('Select Products and Enter Price'),
         content: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -86,12 +86,12 @@ class _ProductsDialogState extends State<ProductsDialog> {
                 TextFormField(
                   focusNode: _focusNode,
                   controller: _costController,
-                  decoration: const InputDecoration(labelText: 'Cost (\$)'),
+                  decoration: const InputDecoration(labelText: 'Price (\$)'),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the cost';
+                      return 'Please enter the price';
                     }
                     // Puedes añadir más validaciones para el costo aquí
                     return null;

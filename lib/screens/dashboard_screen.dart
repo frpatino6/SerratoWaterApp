@@ -51,7 +51,7 @@ class DashboardScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Icon(Icons.add, size: 50.0),
-                      Text('Add New Client', style: TextStyle(fontSize: 20)),
+                      Text('Add New Customer', style: TextStyle(fontSize: 20)),
                     ],
                   ),
                 ),

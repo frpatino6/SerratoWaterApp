@@ -79,7 +79,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               buildTextField(
                   acceptOnlyNumbers: true,
                   controller: _socialSecurityController,
-                  labelText: 'Social Security Number'),
+                  labelText: 'Social Security Number/Itin'),
               const SizedBox(height: 20),
               submitButton(),
             ],
