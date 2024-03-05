@@ -22,14 +22,16 @@ class FirebaseAPI {
   }
 
   Future<Map<String, dynamic>> signUp(
-      String email,
-      String password,
-      String userType,
-      String firstName,
-      String lastName,
-      String address,
-      String parentUser,
-      String phone) async {
+      String? email,
+      String? password,
+      String? userType,
+      String? firstName,
+      String? lastName,
+      String? address,
+      String? parentUser,
+      String? phone,
+      int? status,
+      String? companyName) async {
     final String signUpUrl =
         'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$apiKey';
 
@@ -50,7 +52,7 @@ class FirebaseAPI {
     final responseData = json.decode(response.body);
     // save the user info
     await postUserExtendInfo(email, password, userType, firstName, lastName,
-        address, parentUser, phone);
+        address, parentUser, phone, status, companyName);
 
     return responseData;
   }
@@ -74,14 +76,16 @@ class FirebaseAPI {
   }
 
   Future<void> postUserExtendInfo(
-      String email,
-      String password,
-      String userType,
-      String firstName,
-      String lastName,
-      String address,
-      String parentUser,
-      String phone) async {
+      String? email,
+      String? password,
+      String? userType,
+      String? firstName,
+      String? lastName,
+      String? address,
+      String? parentUser,
+      String? phone,
+      int? status,
+      String? companyName) async {
     String url =
         'https://serratowaterapp-79627-default-rtdb.firebaseio.com/user_extend_info.json';
 
@@ -95,7 +99,9 @@ class FirebaseAPI {
         'phone': phone,
         'userType': userType,
         'parent_user': parentUser,
-        'social_security': password
+        'social_security': password,
+        'status': status,
+        'company_name': companyName
       }),
       headers: {'Content-Type': 'application/json'},
     );
@@ -105,10 +111,21 @@ class FirebaseAPI {
     }
   }
 
-  Future<void> putUserExtendInfo(String id, email, String firstName,
-      String lastName, String address, String phone) async {
+  Future<void> putUserExtendInfo(
+      String id,
+      email,
+      String firstName,
+      String lastName,
+      String address,
+      String phone,
+      String? companyName,
+      String? companyAddress,
+      String? companyPhone,
+      int? status,
+      String ein,
+      String userType,
+      String nodeId) async {
     // Asumiendo que 'userId' es el identificador único del usuario.
-    String nodeId = "-NdwgNZe1oXP6UvCm1_q";
     String url =
         'https://serratowaterapp-79627-default-rtdb.firebaseio.com/user_extend_info/$nodeId.json';
 
@@ -119,7 +136,13 @@ class FirebaseAPI {
         'firstName': firstName,
         'lastName': lastName,
         'address': address,
-        'phone': phone
+        'phone': phone,
+        'company_name': companyName,
+        'company_phone': companyPhone,
+        'company_address': companyAddress,
+        'ein': ein,
+        'status': status,
+        'userType': userType,
       }),
       headers: {'Content-Type': 'application/json'},
     );
@@ -159,13 +182,17 @@ class FirebaseAPI {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
-      // Si la respuesta no está vacía, devolvemos el primer usuario.
+      // Si la respuesta no está vacía, devolvemos el primer usuario y el firstKey.
       if (data.isNotEmpty) {
         final firstKey = data.keys.first;
         final user = data[firstKey];
 
         user['id'] = firstKey;
-        return user;
+        // Cambio aquí: en lugar de retornar solo el usuario, retornamos un mapa que incluye tanto el usuario como su ID (firstKey).
+        return {
+          'firstKey': firstKey,
+          'user': user,
+        };
       }
       // Si no hay datos, retornamos null para indicar que no se encontró ningún usuario.
       return null;

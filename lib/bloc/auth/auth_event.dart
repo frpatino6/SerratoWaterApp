@@ -18,28 +18,32 @@ class LoginEvent extends AuthEvent {
 }
 
 class RegisterEvent extends AuthEvent {
-  final String email;
-  final String password;
-  final String firstName;
-  final String lastName;
-  final String userType;
-  final String address;
-  final String phone;
+  final String? email;
+  final String? password;
+  final String? firstName;
+  final String? lastName;
+  final String? userType;
+  final String? address;
+  final String? phone;
   final String? selectedUserType;
   final String? socialSecurityNumber;
-  final String parentUser;
+  final String? parentUser;
+  final int? status;
+  final String? companyName;
 
   const RegisterEvent({
     required this.email,
     required this.password,
-    required this.firstName,
-    required this.lastName,
-    required this.userType,
-    required this.selectedUserType,
-    required this.address,
-    required this.phone,
+    this.firstName,
+    this.lastName,
+    this.userType,
+    this.selectedUserType,
+    this.address,
+    this.phone,
     this.socialSecurityNumber,
-    required this.parentUser,
+    this.parentUser,
+    this.status,
+    this.companyName,
   });
 }
 

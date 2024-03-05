@@ -26,8 +26,21 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       try {
         emit(UserProfileUpdating());
 
-        await profileRepository.putUserExtendInfo(event.id, event.email,
-            event.name, event.surname, event.address, event.phone);
+        await profileRepository.putUserExtendInfo(
+          event.id,
+          event.email,
+          event.name,
+          event.surname,
+          event.address,
+          event.phone,
+          event.companyName,
+          event.companyAddress,
+          event.companyPhone,
+          event.status,
+          event.ein,
+          event.userType,
+          event.nodeId,
+        );
         emit(UserProfileUpdated());
       } catch (e) {
         emit(ProfileError(e.toString()));

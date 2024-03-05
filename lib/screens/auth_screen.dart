@@ -6,6 +6,7 @@ import 'package:serrato_water_app/bloc/auth/auth_event.dart';
 import 'package:serrato_water_app/bloc/auth/auth_state.dart';
 import 'package:serrato_water_app/providers/user_provider.dart';
 import 'package:serrato_water_app/screens/dashboard_screen.dart';
+import 'package:serrato_water_app/screens/profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -24,8 +25,10 @@ class _AuthScreenState extends State<AuthScreen> {
 
     checkLoginStatus(context);
 
-    _emailController.text = "frpatino6@gmail.com";
-    _passwordController.text = "123456";
+    // _emailController.text = "frpatino6@gmail.com";
+    // _passwordController.text = "123456";
+    _emailController.text = "contoso@contoso.com";
+    _passwordController.text = "contoso@contoso.com";
   }
 
   @override
@@ -40,18 +43,36 @@ class _AuthScreenState extends State<AuthScreen> {
           } else if (state is AuthSuccess) {
             Provider.of<UserProvider>(context, listen: false)
                 .setUsername(_emailController.text);
+
             final prefs = await SharedPreferences.getInstance();
             await prefs.setBool('isLoggedIn', true);
             await prefs.setString('username', _emailController.text);
             await prefs.setString('password', _passwordController.text);
-            await prefs.setString('userType', state.userProfile!['userType']);
+            await prefs.setString(
+                'userType', state.userProfile!["user"]['userType']);
+            await prefs.setInt('status', state.userProfile!["user"]['status']);
 
-            if (context.mounted) {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (_) => DashboardScreen(
-                        userName: _emailController.text,
-                        userType: state.userProfile!['userType'],
-                      )));
+            // Verifica el valor de 'status'
+            int status = state.userProfile!["user"]['status'];
+
+            if (status == 0) {
+              // Si 'status' es igual a '0', navega a ProfileScreen
+              if (context.mounted) {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (_) => ProfileScreen(
+                          userName: _emailController.text,
+                          userType: state.userProfile!["user"]['userType'],
+                        )));
+              }
+            } else {
+              // De lo contrario, continúa a DashboardScreen
+              if (context.mounted) {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (_) => DashboardScreen(
+                          userName: _emailController.text,
+                          userType: state.userProfile!["user"]['userType'],
+                        )));
+              }
             }
           }
         },
@@ -142,12 +163,27 @@ Future<String> getUserType() async {
   return prefs.getString('userType') ?? '';
 }
 
+Future<int> getUserStatus() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getInt('status') ?? 0;
+}
+
 void checkLoginStatus(BuildContext context) async {
   bool isLoggedIn = await isUserLoggedIn();
   if (isLoggedIn) {
     String user = await getUserName();
     String userType = await getUserType();
-    if (context.mounted) {
+    int status = await getUserStatus();
+
+    if (status == 0) {
+      if (context.mounted) {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (_) => ProfileScreen(
+                  userName: user,
+                  userType: userType,
+                )));
+      }
+    } else if (context.mounted) {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (_) => DashboardScreen(
                 userName: user,

@@ -19,11 +19,19 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _firstNameController =
+      TextEditingController(text: "");
+  final TextEditingController _lastNameController =
+      TextEditingController(text: "");
+  final TextEditingController _emailController =
+      TextEditingController(text: "");
+  final TextEditingController _addressController =
+      TextEditingController(text: "");
+  final TextEditingController _phoneController =
+      TextEditingController(text: "");
+  final TextEditingController _companyNameController =
+      TextEditingController(text: "");
+
   final TextEditingController _socialSecurityController =
       TextEditingController();
 
@@ -61,26 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 10),
               parentUserDropdown(),
               const SizedBox(height: 10),
-              buildTextField(
-                  controller: _firstNameController, labelText: 'First Name'),
-              const SizedBox(height: 10),
-              buildTextField(
-                  controller: _lastNameController, labelText: 'Last Name'),
-              const SizedBox(height: 10),
-              buildTextField(
-                  controller: _addressController, labelText: 'Address'),
-              buildTextField(
-                  controller: _phoneController,
-                  labelText: 'Phone',
-                  acceptOnlyNumbers: true),
-              const SizedBox(height: 10),
-              buildTextField(controller: _emailController, labelText: 'Email'),
-              const SizedBox(height: 10),
-              buildTextField(
-                  acceptOnlyNumbers: true,
-                  controller: _socialSecurityController,
-                  labelText: 'Social Security Number/Itin'),
-              const SizedBox(height: 20),
+              ..._buildUserSpecificFields(),
               submitButton(),
             ],
           ),
@@ -171,34 +160,63 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }
       },
       builder: (context, state) {
-        // Si el estado es AuthRegisteringState, muestra un CircularProgressIndicator
         if (state is AuthRegisteringState) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        // En otros estados, muestra el botón de registro
         return ElevatedButton(
           onPressed: (state is! AuthLoading && state is! AuthRegisteringState)
               ? () {
                   if (_formKey.currentState?.validate() ?? false) {
-                    context.read<AuthBloc>().add(
-                          RegisterEvent(
-                            email: _emailController.text,
-                            password: _socialSecurityController.text,
-                            firstName: _firstNameController.text,
-                            lastName: _lastNameController.text,
-                            userType: _userType!,
-                            selectedUserType: _selectedUser,
-                            address: _addressController.text,
-                            phone: _phoneController.text,
-                            socialSecurityNumber:
-                                _socialSecurityController.text,
-                            parentUser: _selectedUser!,
-                          ),
-                        );
+                    // Validación específica para Dealers y companyName
+                    if (_userType == 'Dealer' &&
+                        _companyNameController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Please enter a company name")),
+                      );
+                      return; // Detiene la ejecución si falla esta validación
+                    }
+
+                    // A partir de aquí, el código es el mismo que ya tienes,
+                    // ya que las otras validaciones son manejadas por el _formKey.currentState?.validate()
+                    if (_userType == 'Dealer') {
+                      context.read<AuthBloc>().add(
+                            RegisterEvent(
+                              email: _emailController.text,
+                              password: _emailController.text,
+                              userType: _userType!,
+                              selectedUserType: _selectedUser,
+                              address: _addressController.text,
+                              phone: _phoneController.text,
+                              socialSecurityNumber:
+                                  _socialSecurityController.text,
+                              parentUser: _selectedUser!,
+                              companyName: _companyNameController.text,
+                              status: 0,
+                            ),
+                          );
+                    } else {
+                      context.read<AuthBloc>().add(
+                            RegisterEvent(
+                              email: _emailController.text,
+                              password: _socialSecurityController.text,
+                              firstName: _firstNameController.text,
+                              lastName: _lastNameController.text,
+                              userType: _userType!,
+                              selectedUserType: _selectedUser,
+                              address: _addressController.text,
+                              phone: _phoneController.text,
+                              socialSecurityNumber:
+                                  _socialSecurityController.text,
+                              parentUser: _selectedUser!,
+                              status: 0,
+                            ),
+                          );
+                    }
                   }
                 }
-              : null, // Deshabilita el botón cuando está cargando o registrando
+              : null,
           child: const Text('Register'),
         );
       },
@@ -237,5 +255,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
         return null;
       },
     );
+  }
+
+  List<Widget> _buildUserSpecificFields() {
+    if (_userType == 'Dealer') {
+      // Si el tipo de usuario es 'Dealer', solicita 'Company Name'
+      return [
+        buildTextField(
+            controller: _companyNameController, labelText: 'Company Name'),
+        const SizedBox(height: 10),
+        buildTextField(controller: _emailController, labelText: 'Email'),
+      ];
+    } else {
+      return [
+        buildTextField(
+            controller: _firstNameController, labelText: 'First Name'),
+        const SizedBox(height: 10),
+        buildTextField(controller: _lastNameController, labelText: 'Last Name'),
+        const SizedBox(height: 10),
+        const SizedBox(height: 10),
+        buildTextField(controller: _addressController, labelText: 'Address'),
+        buildTextField(
+            controller: _phoneController,
+            labelText: 'Phone',
+            acceptOnlyNumbers: true),
+        const SizedBox(height: 10),
+        buildTextField(controller: _emailController, labelText: 'Email'),
+        const SizedBox(height: 10),
+        buildTextField(
+            acceptOnlyNumbers: true,
+            controller: _socialSecurityController,
+            labelText: 'Social Security Number/Itin'),
+        const SizedBox(height: 20),
+      ];
+    }
   }
 }

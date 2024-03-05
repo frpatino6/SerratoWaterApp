@@ -23,8 +23,7 @@ class _SingleDataCaptureScreenState extends State<SingleDataCaptureScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _socialSecurityNumberController =
-      TextEditingController();
+
   List<String> _selectedProducts = [];
 
   @override
@@ -119,7 +118,7 @@ class _SingleDataCaptureScreenState extends State<SingleDataCaptureScreen> {
                         borderRadius: BorderRadius.all(Radius.circular(2)),
                       ),
                     ),
-                    child: const Text('Products Sale'),
+                    child: const Text('Products'),
                   ),
                   const SizedBox(height: 10),
                   Wrap(
@@ -186,18 +185,6 @@ class _SingleDataCaptureScreenState extends State<SingleDataCaptureScreen> {
                       return null;
                     },
                   ),
-                  TextFormField(
-                    controller: _socialSecurityNumberController,
-                    decoration: const InputDecoration(
-                        labelText: 'Social Security Number'),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your social security number';
-                      }
-                      return null;
-                    },
-                  ),
                 ],
               ),
             ),
@@ -222,7 +209,7 @@ class _SingleDataCaptureScreenState extends State<SingleDataCaptureScreen> {
         "applicantName": "${_nameController.text} ${_lastNameController.text}",
         "dateOfBirth": DateTime(0).toIso8601String(),
         "phoneNumber": _phoneController.text,
-        "socialSecurityNumber": _socialSecurityNumberController.text,
+        "socialSecurityNumber": '',
         "idNumberDriverLicense": "",
         "idIssueDate": DateTime(0).toIso8601String(),
         "expirationDate": DateTime(0).toIso8601String(),

@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class DashboardScreen extends StatelessWidget {
   final String userName;
   final String userType;
+
   const DashboardScreen(
       {super.key, required this.userName, required this.userType});
 
@@ -143,6 +144,7 @@ class DashboardScreen extends StatelessWidget {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => ProfileScreen(
               userName: userName,
+              userType: userType,
             )));
   }
 

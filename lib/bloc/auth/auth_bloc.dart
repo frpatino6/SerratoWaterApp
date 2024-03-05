@@ -35,7 +35,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           event.lastName,
           event.address,
           event.parentUser,
-          event.phone);
+          event.phone,
+          event.status,
+          event.companyName);
       if (result.containsKey('error')) {
         emit(AuthFailure(result['error']['message']));
       } else {

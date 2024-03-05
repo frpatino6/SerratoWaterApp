@@ -797,6 +797,69 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
     setState(() {});
   }
 
+  bool _areAllFieldsFilled() {
+    // Lista de todos los TextEditingController
+    List<TextEditingController> controllers = [
+      _saleAmountController,
+      _productsSoldController,
+      _applicantFirstNameController,
+      _applicantLastNameController,
+      _phoneNumberController,
+      _dateOfBirthController,
+      _idIssueDateController,
+      _emailController,
+      _socialSecurityNumberController,
+      _idNumberDriverLicenseController,
+      _addressController,
+      _stateController,
+      _cityZipCodeController,
+      _installationAddressDifferentController,
+      _expirationDateController,
+      _cityController,
+      _monthlyMortgagePaymentController,
+      _employerNameController,
+      _employerPhoneNumberController,
+      _occupationController,
+      _timeAtCurrentJobController,
+      _employmentMonthlyIncomeController,
+      _otherIncomeController,
+      _sourceOfOtherIncomeController,
+      _forIDPurposesController,
+      _creditCardExpirationDateController,
+      _userController,
+      _timeAtResidenceController,
+      _bankNameController,
+      _accountHolderController,
+      _routingNumberController,
+      _accountNumberController,
+      _coApplicationFirsNameController,
+      _coApplicationLastNameController,
+      _coApplicationPhoneNumberController,
+      _coApplicationEmailController,
+      _coApplicationSSNController,
+      _coApplicationIDNumberController,
+      _coApplicationExpirationDateController,
+      _coApplicationResidenceDurationController,
+      _coApplicationAddressController,
+      _coApplicationCityController,
+      _coApplicationStateController,
+      _coApplicationZipCodeController,
+      _coApplicationMortgagePaymentController,
+      _coApplicationEmployerNameController,
+      _coApplicationEmployerPhoneNumberController,
+      _coApplicationOccupationController,
+      _coApplicationJobDurationController,
+      _coApplicationMonthlyIncomeController,
+      _coApplicationOtherIncomeController,
+      _coApplicationOtherIncomeSourceController,
+      _coApplicationIDPurposeController,
+      _coApplicationCreditCardExpirationController,
+    ];
+
+    // Verifica si algún controlador está vacío
+    return controllers.every((controller) => controller.text.isNotEmpty);
+  }
+
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -895,9 +958,16 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   }
 
   void _validateAndSubmitForm() {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() && _areAllFieldsFilled()) {
       _formKey.currentState!.save();
       _submitForm();
+    } else {
+      // Paso 3: Informar al usuario que todos los campos son obligatorios
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please fill in all fields."),
+        ),
+      );
     }
   }
 
