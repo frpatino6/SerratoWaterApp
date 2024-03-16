@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:serrato_water_app/api/fireBaseApi.dart';
 import 'package:serrato_water_app/bloc/auth/auth_bloc.dart';
 import 'package:serrato_water_app/bloc/auth/auth_event.dart';
@@ -9,24 +13,80 @@ import 'package:serrato_water_app/bloc/profile/profile_state.dart';
 import 'package:serrato_water_app/screens/auth_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfileScreen extends StatelessWidget {
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController surnameController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController guidController = TextEditingController();
-  final TextEditingController companyAddressController =
-      TextEditingController();
-  final TextEditingController companyPhoneController = TextEditingController();
-  final TextEditingController einController = TextEditingController();
-  final TextEditingController companyNameController = TextEditingController();
-  final TextEditingController firstKeyController = TextEditingController();
-
+class ProfileScreen extends StatefulWidget {
   final String userName;
   final String userType;
   ProfileScreen({Key? key, required this.userName, required this.userType})
       : super(key: key);
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final TextEditingController nameController = TextEditingController();
+
+  final TextEditingController surnameController = TextEditingController();
+
+  final TextEditingController phoneController = TextEditingController();
+
+  final TextEditingController addressController = TextEditingController();
+
+  final TextEditingController emailController = TextEditingController();
+
+  final TextEditingController guidController = TextEditingController();
+
+  final TextEditingController companyAddressController =
+      TextEditingController();
+
+  final TextEditingController companyPhoneController = TextEditingController();
+
+  final TextEditingController einController = TextEditingController();
+
+  final TextEditingController companyNameController = TextEditingController();
+
+  final TextEditingController firstKeyController = TextEditingController();
+
+  final ImagePicker _picker = ImagePicker();
+
+  XFile? _imageFile;
+  Key imageKey = UniqueKey();
+
+  Future<void> _pickImageFromCamera() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = pickedFile;
+        imageKey = UniqueKey();
+      });
+    }
+  }
+
+  Future<void> uploadImage(BuildContext context) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+      try {
+        // Sube la imagen a Firebase Storage
+        await FirebaseStorage.instance
+            .ref('profile_images/${widget.userName}.jpg')
+            .putFile(imageFile);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Image uploaded successfully')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to upload image: $e')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No image selected')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,12 +94,16 @@ class ProfileScreen extends StatelessWidget {
       create: (context) => ProfileBloc(FirebaseAPI()),
       child: Builder(
         builder: (context) {
-          context.read<ProfileBloc>().add(LoadUserProfile(userName));
+          context.read<ProfileBloc>().add(LoadUserProfile(widget.userName));
 
           return Scaffold(
             appBar: AppBar(
               title: const Text('Profile'),
               actions: <Widget>[
+                IconButton(
+                  icon: const Icon(Icons.image),
+                  onPressed: _pickImageFromCamera,
+                ),
                 IconButton(
                   icon: const Icon(Icons.save),
                   onPressed: () {
@@ -53,18 +117,20 @@ class ProfileScreen extends StatelessWidget {
                                 phoneController.text,
                                 addressController.text,
                                 emailController.text,
-                                userType == 'Dealer'
+                                widget.userType == 'Dealer'
                                     ? companyNameController.text
                                     : "",
-                                userType == 'Dealer'
+                                widget.userType == 'Dealer'
                                     ? companyAddressController.text
                                     : "",
-                                userType == 'Dealer'
+                                widget.userType == 'Dealer'
                                     ? companyPhoneController.text
                                     : "",
-                                userType == 'Dealer' ? einController.text : "",
+                                widget.userType == 'Dealer'
+                                    ? einController.text
+                                    : "",
                                 1,
-                                userType,
+                                widget.userType,
                                 firstKeyController.text),
                           );
                     }
@@ -128,7 +194,7 @@ class ProfileScreen extends StatelessWidget {
                     firstKeyController.text =
                         state.userProfile['firstKey'] ?? '';
                   }
-                  if (userType == 'Dealer') {
+                  if (widget.userType == 'Dealer') {
                     return ListView(
                       children: [
                         TextFormField(
@@ -175,29 +241,9 @@ class ProfileScreen extends StatelessWidget {
                               const InputDecoration(labelText: 'Address'),
                         ),
                         const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (state is! ProfileLoading) {
-                              context.read<ProfileBloc>().add(
-                                    UpdateUserProfile(
-                                        guidController.text,
-                                        nameController.text,
-                                        surnameController.text,
-                                        phoneController.text,
-                                        addressController.text,
-                                        emailController.text,
-                                        companyNameController.text,
-                                        companyAddressController.text,
-                                        companyPhoneController.text,
-                                        einController.text,
-                                        1,
-                                        userType,
-                                        firstKeyController.text),
-                                  );
-                              const Center(child: CircularProgressIndicator());
-                            }
-                          },
-                          child: const Text('Update Profile'),
+                        Image.file(
+                          File(_imageFile!.path),
+                          key: imageKey, // Usa la clave única aquí
                         ),
                       ],
                     );
@@ -228,6 +274,10 @@ class ProfileScreen extends StatelessWidget {
                           readOnly: true,
                         ),
                         const SizedBox(height: 20),
+                        Image.file(
+                          File(_imageFile!.path),
+                          key: imageKey, // Usa la clave única aquí
+                        ),
                       ],
                     );
                   }
