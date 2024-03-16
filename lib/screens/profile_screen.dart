@@ -241,10 +241,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               const InputDecoration(labelText: 'Address'),
                         ),
                         const SizedBox(height: 20),
-                        Image.file(
-                          File(_imageFile!.path),
-                          key: imageKey, // Usa la clave única aquí
-                        ),
+                        if (_imageFile != null)
+                          Image.file(File(_imageFile!.path))
                       ],
                     );
                   } else {
@@ -274,10 +272,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           readOnly: true,
                         ),
                         const SizedBox(height: 20),
-                        Image.file(
-                          File(_imageFile!.path),
-                          key: imageKey, // Usa la clave única aquí
-                        ),
+                        if (_imageFile != null)
+                          Image.file(File(_imageFile!.path))
                       ],
                     );
                   }
