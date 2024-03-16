@@ -41,6 +41,36 @@ class ProfileScreen extends StatelessWidget {
               title: const Text('Profile'),
               actions: <Widget>[
                 IconButton(
+                  icon: const Icon(Icons.save),
+                  onPressed: () {
+                    if (BlocProvider.of<ProfileBloc>(context).state
+                        is! ProfileLoading) {
+                      context.read<ProfileBloc>().add(
+                            UpdateUserProfile(
+                                guidController.text,
+                                nameController.text,
+                                surnameController.text,
+                                phoneController.text,
+                                addressController.text,
+                                emailController.text,
+                                userType == 'Dealer'
+                                    ? companyNameController.text
+                                    : "",
+                                userType == 'Dealer'
+                                    ? companyAddressController.text
+                                    : "",
+                                userType == 'Dealer'
+                                    ? companyPhoneController.text
+                                    : "",
+                                userType == 'Dealer' ? einController.text : "",
+                                1,
+                                userType,
+                                firstKeyController.text),
+                          );
+                    }
+                  },
+                ),
+                IconButton(
                     icon: const Icon(Icons.logout_sharp),
                     onPressed: () async {
                       BlocProvider.of<AuthBloc>(context).add(LogoutEvent());
@@ -198,30 +228,6 @@ class ProfileScreen extends StatelessWidget {
                           readOnly: true,
                         ),
                         const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (state is! ProfileLoading) {
-                              context.read<ProfileBloc>().add(
-                                    UpdateUserProfile(
-                                        guidController.text,
-                                        nameController.text,
-                                        surnameController.text,
-                                        phoneController.text,
-                                        addressController.text,
-                                        emailController.text,
-                                        "",
-                                        "",
-                                        "",
-                                        "",
-                                        1,
-                                        userType,
-                                        firstKeyController.text),
-                                  );
-                              const Center(child: CircularProgressIndicator());
-                            }
-                          },
-                          child: const Text('Update Profile'),
-                        ),
                       ],
                     );
                   }
