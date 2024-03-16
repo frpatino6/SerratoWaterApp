@@ -156,13 +156,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 listener: (context, state) {
                   if (state is UserProfileUpdated) {
                     ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar() // Esconde cualquier SnackBar actual antes de mostrar uno nuevo
+                      ..hideCurrentSnackBar()
                       ..showSnackBar(
                         const SnackBar(
                             content: Text('Profile updated successfully')),
                       );
-                    // Opcional: Si deseas recargar la página o realizar alguna acción después de la actualización
-                    // context.read<ProfileBloc>().add(LoadUserProfile(userName));
                   } else if (state is ProfileError) {
                     ScaffoldMessenger.of(context)
                       ..hideCurrentSnackBar()
