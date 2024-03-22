@@ -21,6 +21,7 @@ import 'package:serrato_water_app/widgets/identification_information.dart';
 import 'package:serrato_water_app/widgets/personal_information.dart';
 import 'package:serrato_water_app/widgets/products_sale.dart';
 import 'package:serrato_water_app/widgets/work_information.dart';
+import 'package:uuid/uuid.dart';
 
 class DataCaptureScreen extends StatefulWidget {
   final String userName;
@@ -832,28 +833,28 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
       _accountHolderController,
       _routingNumberController,
       _accountNumberController,
-      _coApplicationFirsNameController,
-      _coApplicationLastNameController,
-      _coApplicationPhoneNumberController,
-      _coApplicationEmailController,
-      _coApplicationSSNController,
-      _coApplicationIDNumberController,
-      _coApplicationExpirationDateController,
-      _coApplicationResidenceDurationController,
-      _coApplicationAddressController,
-      _coApplicationCityController,
-      _coApplicationStateController,
-      _coApplicationZipCodeController,
-      _coApplicationMortgagePaymentController,
-      _coApplicationEmployerNameController,
-      _coApplicationEmployerPhoneNumberController,
-      _coApplicationOccupationController,
-      _coApplicationJobDurationController,
-      _coApplicationMonthlyIncomeController,
-      _coApplicationOtherIncomeController,
-      _coApplicationOtherIncomeSourceController,
-      _coApplicationIDPurposeController,
-      _coApplicationCreditCardExpirationController,
+      // _coApplicationFirsNameController,
+      // _coApplicationLastNameController,
+      // _coApplicationPhoneNumberController,
+      // _coApplicationEmailController,
+      // _coApplicationSSNController,
+      // _coApplicationIDNumberController,
+      // _coApplicationExpirationDateController,
+      // _coApplicationResidenceDurationController,
+      // _coApplicationAddressController,
+      // _coApplicationCityController,
+      // _coApplicationStateController,
+      // _coApplicationZipCodeController,
+      // _coApplicationMortgagePaymentController,
+      // _coApplicationEmployerNameController,
+      // _coApplicationEmployerPhoneNumberController,
+      // _coApplicationOccupationController,
+      // _coApplicationJobDurationController,
+      // _coApplicationMonthlyIncomeController,
+      // _coApplicationOtherIncomeController,
+      // _coApplicationOtherIncomeSourceController,
+      // _coApplicationIDPurposeController,
+      // _coApplicationCreditCardExpirationController,
     ];
 
     // Verifica si algún controlador está vacío
@@ -863,8 +864,10 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+      var uuid = const Uuid();
 
       final applicationData = {
+        "applicantId": uuid.v4(),
         "saleAmount": _saleAmountController.text,
         "salesRepresentative": _user,
         "productsSold": _selectedProducts.join(", "),

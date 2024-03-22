@@ -28,10 +28,33 @@ class CreditApplicationApi {
       List<SaleData> salesDataList = [];
 
       data.forEach((key, value) {
-        SaleData saleData = SaleData.fromMap(value as Map<String, dynamic>);
+        // Asegúrate de que el constructor y fromMap ahora incluyan el ID
+        SaleData saleData =
+            SaleData.fromMap(key, value as Map<String, dynamic>);
         if (saleData.user == user) {
           salesDataList.add(saleData);
         }
+      });
+
+      return salesDataList;
+    } else {
+      throw Exception('Failed to load sales data');
+    }
+  }
+
+  Future<List<SaleData>> getAllSalesData() async {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      List<SaleData> salesDataList = [];
+
+      data.forEach((key, value) {
+        // Asegúrate de que el constructor y fromMap ahora incluyan el ID
+        SaleData saleData =
+            SaleData.fromMap(key, value as Map<String, dynamic>);
+
+        salesDataList.add(saleData);
       });
 
       return salesDataList;
@@ -47,7 +70,7 @@ class CreditApplicationApi {
 
     final response = await http.patch(
       Uri.parse(url),
-      body: json.encode({'status': status}),
+      body: json.encode({'applicationState': status}),
       headers: {'Content-Type': 'application/json'},
     );
 

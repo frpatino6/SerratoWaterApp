@@ -1,4 +1,6 @@
 class SaleData {
+  String id;
+  String applicantId;
   String applicantName;
   String saleAmount;
   String salesRepresentative;
@@ -37,7 +39,9 @@ class SaleData {
   String installationZipCode;
   String applicationState;
   SaleData(
-      {required this.applicantName,
+      {required this.id,
+      required this.applicantId,
+      required this.applicantName,
       required this.saleAmount,
       required this.salesRepresentative,
       required this.productsSold,
@@ -78,6 +82,8 @@ class SaleData {
   // Método para convertir un objeto SaleData a un mapa, útil para operaciones de base de datos
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
+      'applicantId': applicantId,
       'saleAmount': saleAmount,
       'salesRepresentative': salesRepresentative,
       'productsSold': productsSold,
@@ -117,8 +123,10 @@ class SaleData {
   }
 
   // Método para crear un objeto SaleData desde un mapa, útil para operaciones de base de datos
-  static SaleData fromMap(Map<String, dynamic> map) {
+  static SaleData fromMap(String id, Map<String, dynamic> map) {
     return SaleData(
+      id: id,
+      applicantId: map['applicantId'],
       applicantName: map['applicantName'],
       saleAmount: map['saleAmount'],
       salesRepresentative: map['salesRepresentative'],
@@ -163,6 +171,8 @@ class SaleData {
     var data = json.values.first;
 
     return SaleData(
+      id: data['id'] ?? '',
+      applicantId: data['applicantId'] ?? '',
       applicantName: data['applicantName'] ?? '',
       saleAmount: data['saleAmount'] ?? '',
       salesRepresentative: data['salesRepresentative'] ?? '',

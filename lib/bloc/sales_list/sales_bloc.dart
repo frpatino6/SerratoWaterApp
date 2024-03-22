@@ -8,6 +8,7 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
 
   SalesBloc({required this.api}) : super(SalesInitial()) {
     on<LoadSalesEvent>(_onLoadSalesEvent);
+    on<LoadAllSalesEvent>(_onLoadAllSalesEvent);
     on<UpdateSalesStatusEvent>(_onUpdateSalesStatusEvent);
   }
 
@@ -20,6 +21,19 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
       emit(SalesLoaded(salesData));
     } catch (error) {
       emit(SalesError('Error loading sales data'));
+    }
+  }
+
+  Future<void> _onLoadAllSalesEvent(
+      LoadAllSalesEvent event, Emitter<SalesState> emit) async {
+    emit(SalesLoading());
+
+    try {
+      final salesData =
+          await api.getAllSalesData(); // Asumiendo que existe este método
+      emit(SalesLoaded(salesData));
+    } catch (error) {
+      emit(SalesError('Error loading all sales data'));
     }
   }
 

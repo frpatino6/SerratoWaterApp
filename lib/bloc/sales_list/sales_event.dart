@@ -9,6 +9,8 @@ class LoadSalesEvent extends SalesEvent {
   LoadSalesEvent(this.user);
 }
 
+class LoadAllSalesEvent extends SalesEvent {}
+
 // add event updating sales status
 class UpdateSalesStatusEvent extends SalesEvent {
   final String salesId;

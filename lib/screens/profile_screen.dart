@@ -49,11 +49,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final ImagePicker _picker = ImagePicker();
 
-  XFile? _imageFile;
   Key imageKey = UniqueKey();
+  XFile? pickedFile;
+  String? _imageUrl;
+  XFile? _imageFile;
 
   Future<void> _pickImageFromCamera() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    pickedFile = await _picker.pickImage(
+      source: ImageSource.camera,
+      maxWidth:
+          1024, // Define el ancho máximo para reducir el tamaño de la imagen
+      maxHeight:
+          768, // Define la altura máxima para reducir el tamaño de la imagen
+      imageQuality:
+          60, // Ajusta la calidad de la imagen (0-100), siendo 100 la máxima calidad
+    );
+
     if (pickedFile != null) {
       setState(() {
         _imageFile = pickedFile;
@@ -63,11 +74,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> uploadImage(BuildContext context) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-
     if (pickedFile != null) {
-      File imageFile = File(pickedFile.path);
+      File imageFile = File(pickedFile!.path);
       try {
         // Sube la imagen a Firebase Storage
         await FirebaseStorage.instance
@@ -86,6 +94,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SnackBar(content: Text('No image selected')),
       );
     }
+  }
+
+  Future<void> loadImageFromFirebaseStorage() async {
+    try {
+      final ref =
+          FirebaseStorage.instance.ref('profile_images/${widget.userName}.jpg');
+
+      final String imageUrl = await ref.getDownloadURL();
+
+      setState(() {
+        _imageUrl = imageUrl;
+        _imageFile = null;
+      });
+    } catch (e) {
+      // Maneja el error de alguna manera, por ejemplo, mostrando un mensaje al usuario
+    }
+  }
+
+  Widget _buildImage() {
+    Widget imageWidget;
+
+    // Decide el widget de imagen basado en la fuente disponible
+    if (_imageUrl != null) {
+      imageWidget = Image.network(_imageUrl!, fit: BoxFit.cover);
+    } else if (_imageFile != null) {
+      imageWidget = Image.file(File(_imageFile!.path), fit: BoxFit.cover);
+    } else {
+      // Un placeholder en caso de que no haya imagen disponible
+      imageWidget = const Text('No image selected');
+    }
+
+    // Retorna la imagen dentro de un contenedor con estilo
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 8.0, bottom: 8.0),
+          child: Text(
+            'License of Transit',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.blueAccent),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: imageWidget,
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadImageFromFirebaseStorage();
   }
 
   @override
@@ -109,8 +181,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: () {
                     if (BlocProvider.of<ProfileBloc>(context).state
                         is! ProfileLoading) {
-                      context.read<ProfileBloc>().add(
-                            UpdateUserProfile(
+                      // Verifica si se ha seleccionado una imagen
+                      if (_imageFile == null) {
+                        // Muestra un AlertDialog si no hay imagen seleccionada
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Missing Image'),
+                              content: const Text(
+                                  'Please, upload the transit license image before saving.'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text('OK'),
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pop(); // Cierra el AlertDialog
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        // Procede con la actualización del perfil y la carga de la imagen
+                        context.read<ProfileBloc>().add(
+                              UpdateUserProfile(
                                 guidController.text,
                                 nameController.text,
                                 surnameController.text,
@@ -131,8 +227,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     : "",
                                 1,
                                 widget.userType,
-                                firstKeyController.text),
-                          );
+                                firstKeyController.text,
+                              ),
+                            );
+                        uploadImage(context);
+                      }
                     }
                   },
                 ),
@@ -239,8 +338,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               const InputDecoration(labelText: 'Address'),
                         ),
                         const SizedBox(height: 20),
-                        if (_imageFile != null)
-                          Image.file(File(_imageFile!.path))
+                        _buildImage(),
                       ],
                     );
                   } else {
@@ -270,8 +368,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           readOnly: true,
                         ),
                         const SizedBox(height: 20),
-                        if (_imageFile != null)
-                          Image.file(File(_imageFile!.path))
+                        _buildImage(),
                       ],
                     );
                   }
