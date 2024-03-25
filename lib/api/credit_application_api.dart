@@ -80,4 +80,26 @@ class CreditApplicationApi {
 
     return 'Sales status updated';
   }
+
+  Future<String> updateSalesStatusAndInstaller(
+      String salesId, String status, String emailInstaller) async {
+    String url =
+        'https://serratowaterapp-79627-default-rtdb.firebaseio.com/credit_application/$salesId.json';
+
+    final response = await http.patch(
+      Uri.parse(url),
+      body: json.encode({
+        'applicationState': status,
+        'userOwner': emailInstaller,
+        'installationDate': DateTime.now().toString()
+      }),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update sales status');
+    }
+
+    return 'Sales status updated';
+  }
 }

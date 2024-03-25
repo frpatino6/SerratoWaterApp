@@ -10,6 +10,8 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
     on<LoadSalesEvent>(_onLoadSalesEvent);
     on<LoadAllSalesEvent>(_onLoadAllSalesEvent);
     on<UpdateSalesStatusEvent>(_onUpdateSalesStatusEvent);
+    on<UpdateSalesStatusEmialInstalleEvent>(
+        _onUpdateSalesStatusEmailInstallerEvent);
   }
 
   Future<void> _onLoadSalesEvent(
@@ -43,6 +45,20 @@ class SalesBloc extends Bloc<SalesEvent, SalesState> {
 
     try {
       final message = await api.updateSalesStatus(event.salesId, event.status);
+      emit(SalesStatusUpdated(message));
+    } catch (error) {
+      emit(SalesError('Error updating sales status'));
+    }
+  }
+
+  Future<void> _onUpdateSalesStatusEmailInstallerEvent(
+      UpdateSalesStatusEmialInstalleEvent event,
+      Emitter<SalesState> emit) async {
+    emit(SalesLoading());
+
+    try {
+      final message = await api.updateSalesStatusAndInstaller(
+          event.salesId, event.status, event.emailInstalle);
       emit(SalesStatusUpdated(message));
     } catch (error) {
       emit(SalesError('Error updating sales status'));

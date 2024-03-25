@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:serrato_water_app/bloc/sales_list/sales_bloc.dart';
 import 'package:serrato_water_app/bloc/sales_list/sales_event.dart';
 import 'package:serrato_water_app/bloc/sales_list/sales_state.dart';
 import 'package:serrato_water_app/models/sales_data.dart';
-import 'package:serrato_water_app/providers/user_provider.dart';
 import 'package:serrato_water_app/screens/update_application_status.dart';
 
 class MisTransaccionesScreen extends StatefulWidget {
   final String userType;
-
-  const MisTransaccionesScreen({super.key, required this.userType});
+  final String userName;
+  const MisTransaccionesScreen(
+      {super.key, required this.userType, required this.userName});
 
   @override
   State<MisTransaccionesScreen> createState() => _MisTransaccionesScreenState();
@@ -28,8 +27,7 @@ class _MisTransaccionesScreenState extends State<MisTransaccionesScreen> {
     if (widget.userType == 'SuperAdministrator') {
       context.read<SalesBloc>().add(LoadAllSalesEvent());
     } else {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      context.read<SalesBloc>().add(LoadSalesEvent(userProvider.username));
+      context.read<SalesBloc>().add(LoadSalesEvent(widget.userName));
     }
   }
 
@@ -126,7 +124,8 @@ class CustomListItem extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => UpdateApplicationStatus(saleData: saleData),
+            builder: (context) => UpdateApplicationStatus(
+                saleData: saleData, currentUserType: userType),
           ),
         );
       },

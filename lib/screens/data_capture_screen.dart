@@ -833,28 +833,28 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
       _accountHolderController,
       _routingNumberController,
       _accountNumberController,
-      // _coApplicationFirsNameController,
-      // _coApplicationLastNameController,
-      // _coApplicationPhoneNumberController,
-      // _coApplicationEmailController,
-      // _coApplicationSSNController,
-      // _coApplicationIDNumberController,
-      // _coApplicationExpirationDateController,
-      // _coApplicationResidenceDurationController,
-      // _coApplicationAddressController,
-      // _coApplicationCityController,
-      // _coApplicationStateController,
-      // _coApplicationZipCodeController,
-      // _coApplicationMortgagePaymentController,
-      // _coApplicationEmployerNameController,
-      // _coApplicationEmployerPhoneNumberController,
-      // _coApplicationOccupationController,
-      // _coApplicationJobDurationController,
-      // _coApplicationMonthlyIncomeController,
-      // _coApplicationOtherIncomeController,
-      // _coApplicationOtherIncomeSourceController,
-      // _coApplicationIDPurposeController,
-      // _coApplicationCreditCardExpirationController,
+      _coApplicationFirsNameController,
+      _coApplicationLastNameController,
+      _coApplicationPhoneNumberController,
+      _coApplicationEmailController,
+      _coApplicationSSNController,
+      _coApplicationIDNumberController,
+      _coApplicationExpirationDateController,
+      _coApplicationResidenceDurationController,
+      _coApplicationAddressController,
+      _coApplicationCityController,
+      _coApplicationStateController,
+      _coApplicationZipCodeController,
+      _coApplicationMortgagePaymentController,
+      _coApplicationEmployerNameController,
+      _coApplicationEmployerPhoneNumberController,
+      _coApplicationOccupationController,
+      _coApplicationJobDurationController,
+      _coApplicationMonthlyIncomeController,
+      _coApplicationOtherIncomeController,
+      _coApplicationOtherIncomeSourceController,
+      _coApplicationIDPurposeController,
+      _coApplicationCreditCardExpirationController,
     ];
 
     // Verifica si algún controlador está vacío
@@ -913,6 +913,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
         "coApplicantName": _coApplicantName,
         "coApplicantDOB": _coApplicantDOB,
         "coApplicantPhoneNumber": _coApplicantPhoneNumber,
+        "installationDate": ""
       };
 
       BlocProvider.of<CreditApplicationBloc>(context)
@@ -965,11 +966,22 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
       _formKey.currentState!.save();
       _submitForm();
     } else {
-      // Paso 3: Informar al usuario que todos los campos son obligatorios
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please fill in all fields."),
-        ),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Incomplete Form'),
+            content: const Text('Please fill in all fields.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Cierra el AlertDialog
+                },
+              ),
+            ],
+          );
+        },
       );
     }
   }

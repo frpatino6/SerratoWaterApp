@@ -136,6 +136,7 @@ class DashboardScreen extends StatelessWidget {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => MisTransaccionesScreen(
               userType: userType,
+              userName: userName,
             )));
   }
 

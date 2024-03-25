@@ -18,3 +18,12 @@ class UpdateSalesStatusEvent extends SalesEvent {
 
   UpdateSalesStatusEvent(this.salesId, this.status);
 }
+
+class UpdateSalesStatusEmialInstalleEvent extends SalesEvent {
+  final String salesId;
+  final String status;
+  final String emailInstalle;
+
+  UpdateSalesStatusEmialInstalleEvent(
+      this.salesId, this.status, this.emailInstalle);
+}

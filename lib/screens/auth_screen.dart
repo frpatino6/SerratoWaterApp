@@ -27,8 +27,10 @@ class _AuthScreenState extends State<AuthScreen> {
 
     // _emailController.text = "frpatino6@gmail.com";
     // _passwordController.text = "123456";
-    _emailController.text = "contoso@contoso.com";
-    _passwordController.text = "contoso@contoso.com";
+    // _emailController.text = "contoso@contoso.com";
+    // _passwordController.text = "contoso@contoso.com";
+    _emailController.text = "installer1@gmail.com";
+    _passwordController.text = "installer1@gmail.com";
   }
 
   @override

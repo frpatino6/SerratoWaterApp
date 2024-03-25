@@ -1,19 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:serrato_water_app/bloc/sales_list/sales_bloc.dart';
 import 'package:serrato_water_app/bloc/sales_list/sales_event.dart';
+import 'package:serrato_water_app/bloc/users/user_bloc.dart';
+import 'package:serrato_water_app/bloc/users/user_event.dart';
+import 'package:serrato_water_app/bloc/users/user_state.dart';
 import 'package:serrato_water_app/models/sales_data.dart';
+import 'package:serrato_water_app/models/user_data.dart';
+import 'package:serrato_water_app/screens/CreditApplicationProcessingScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class UpdateApplicationStatus extends StatelessWidget {
+class UpdateApplicationStatus extends StatefulWidget {
   final SaleData saleData;
+  final String currentUserType;
+  const UpdateApplicationStatus(
+      {super.key, required this.saleData, required this.currentUserType});
 
-  const UpdateApplicationStatus({super.key, required this.saleData});
+  @override
+  State<UpdateApplicationStatus> createState() =>
+      _UpdateApplicationStatusState();
+}
+
+class _UpdateApplicationStatusState extends State<UpdateApplicationStatus> {
+  String? selectedInstaller;
+  DateTime? selectedInstallationDate;
+  late String dropdownValue;
+  late String currentUserType;
+
+  @override
+  void initState() {
+    super.initState();
+    dropdownValue = widget.saleData.applicationState; // Inicialízalo aquí
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<String> products = saleData.productsSold.split(',');
-
+    String formattedDate = '';
+    List<String> products = widget.saleData.productsSold.split(',');
+    // add widget.saleData.installationDate is null or emtpy
+    if (widget.saleData.installationDate.isNotEmpty) {
+      DateTime installationDate = DateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS")
+          .parse(widget.saleData.installationDate);
+      formattedDate = DateFormat("dd/MM/yyyy").format(installationDate);
+    } else {
+      formattedDate = 'Unassigned installation date';
+    }
     TextStyle headingStyle = const TextStyle(
       fontSize: 20,
       fontWeight: FontWeight.bold,
@@ -41,18 +73,20 @@ class UpdateApplicationStatus extends StatelessWidget {
       future: SharedPreferences.getInstance(),
       builder: (context, snapshot) {
         bool isDropdownEnabled = true;
-        String dropdownValue =
-            saleData.applicationState; // Usa el valor actual por defecto
 
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
           final prefs = snapshot.data!;
           final userType = prefs.getString('userType');
           if (userType == "SuperAdministrator" &&
-              saleData.applicationState == "Submitted") {
+              widget.saleData.applicationState == "Submitted") {
+            isDropdownEnabled = false;
             dropdownValue = "Under Review";
           } else {
             isDropdownEnabled = false;
+          }
+          if (userType == "SuperAdministrator") {
+            isDropdownEnabled = true;
           }
         }
 
@@ -60,26 +94,61 @@ class UpdateApplicationStatus extends StatelessWidget {
           appBar: AppBar(
             title: const Text('Application Details'),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.save),
-                onPressed: () {
-                  // Obtener la instancia del Bloc
-                  final salesBloc = BlocProvider.of<SalesBloc>(context);
-                  //
-                  final newState =
-                      dropdownValue; // Este sería el valor actual seleccionado en tu Dropdown
-                  final salesId = saleData
-                      .id; // Asumiendo que tu objeto 'saleData' tiene un campo 'id'
+              if (widget.currentUserType == 'SuperAdministrator' ||
+                  widget.currentUserType == 'Administrator')
+                IconButton(
+                  icon: const Icon(Icons.save),
+                  onPressed: () {
+                    final salesBloc = BlocProvider.of<SalesBloc>(context);
+                    final newState = dropdownValue;
+                    final salesId = widget.saleData.id;
 
-                  // // Despachar el evento para actualizar el estado de la venta
-                  salesBloc.add(UpdateSalesStatusEvent(salesId, newState));
+                    // Verifica si el estado es 'Pending Installation' y si no se ha seleccionado un instalador o fecha de instalación
+                    if (dropdownValue == 'Pending Installation' &&
+                        (selectedInstaller == null ||
+                            selectedInstallationDate == null)) {
+                      // Usa AlertDialog en lugar de SnackBar
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Incomplete Information'),
+                            content: const Text(
+                                'Please select an installer and installation date'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('OK'),
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pop(); // Cierra el AlertDialog
+                                  _showInstallationDialog(context);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      return;
+                    }
 
-                  // Muestra un mensaje indicando que la acción se está ejecutando
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Updating sales status...')),
-                  );
-                },
-              ),
+                    if (selectedInstaller != null &&
+                        selectedInstallationDate != null) {
+                      salesBloc.add(UpdateSalesStatusEmialInstalleEvent(
+                          salesId, newState, selectedInstaller!));
+                    } else {
+                      salesBloc.add(UpdateSalesStatusEvent(salesId, newState));
+                    }
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Updating sales status...')),
+                    );
+                  },
+                ),
+              if (widget.currentUserType == 'Installer')
+                IconButton(
+                  icon: const Icon(Icons.credit_score),
+                  onPressed: _processCreditApplication,
+                ),
             ],
           ),
           body: Padding(
@@ -87,10 +156,16 @@ class UpdateApplicationStatus extends StatelessWidget {
             child: ListView(
               children: [
                 Text('Applicant Name:', style: headingStyle),
-                Text(saleData.applicantName, style: contentStyle),
+                Text(widget.saleData.applicantName, style: contentStyle),
                 const SizedBox(height: 16),
                 Text('Address:', style: headingStyle),
-                Text(saleData.address, style: contentStyle),
+                Text(widget.saleData.address, style: contentStyle),
+                const SizedBox(height: 16),
+                Text('Installation date:', style: headingStyle),
+                Text(formattedDate, style: contentStyle),
+                const SizedBox(height: 16),
+                Text('Installation Address:', style: headingStyle),
+                Text(widget.saleData.address, style: contentStyle),
                 const SizedBox(height: 16),
                 Text('Status:', style: headingStyle),
                 DropdownButtonFormField<String>(
@@ -103,7 +178,14 @@ class UpdateApplicationStatus extends StatelessWidget {
                     );
                   }).toList(),
                   onChanged: isDropdownEnabled
-                      ? (newValue) {}
+                      ? (newValue) {
+                          setState(() {
+                            dropdownValue = newValue!;
+                          });
+                          if (newValue == 'Pending Installation') {
+                            _showInstallationDialog(context);
+                          }
+                        }
                       : null, // Controla si el dropdown es modificable
                 ),
                 const SizedBox(height: 16),
@@ -122,6 +204,96 @@ class UpdateApplicationStatus extends StatelessWidget {
               ],
             ),
           ),
+        );
+      },
+    );
+  }
+
+  void _processCreditApplication() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CreditApplicationProcessingScreen(
+          saleData: widget.saleData,
+        ),
+      ),
+    );
+  }
+
+  void _showInstallationDialog(BuildContext context) {
+    // Trigger the event to load installers
+    context.read<UserBloc>().add(LoadUsers());
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Select Installation Details'),
+          content: BlocBuilder<UserBloc, UserState>(
+            builder: (context, state) {
+              if (state is UserLoading) {
+                return const CircularProgressIndicator();
+              } else if (state is UserLoaded) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    DropdownButtonFormField<String>(
+                      value: selectedInstaller,
+                      hint: const Text('Select Installer'),
+                      items: state.users.map((UserData userData) {
+                        return DropdownMenuItem<String>(
+                          value: userData.email,
+                          child: Text(
+                              "${userData.firstName} ${userData.lastName}"),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedInstaller = newValue;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate:
+                              selectedInstallationDate ?? DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2100),
+                        );
+                        if (pickedDate != null) {
+                          setState(() {
+                            selectedInstallationDate = pickedDate;
+                          });
+                        }
+                      },
+                      child: Text(
+                        selectedInstallationDate == null
+                            ? 'Select Installation Date'
+                            : 'Installation Date: ${selectedInstallationDate!.toLocal().toString().split(' ')[0]}',
+                      ),
+                    ),
+                  ],
+                );
+              } else if (state is UserError) {
+                return Text('Error: ${state.message}');
+              }
+              return const Text('Please wait...');
+            },
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            TextButton(
+              child: const Text('Accept'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+          ],
         );
       },
     );

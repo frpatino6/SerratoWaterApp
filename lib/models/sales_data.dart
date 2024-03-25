@@ -38,6 +38,7 @@ class SaleData {
   String installationState;
   String installationZipCode;
   String applicationState;
+  String installationDate;
   SaleData(
       {required this.id,
       required this.applicantId,
@@ -77,7 +78,8 @@ class SaleData {
       required this.installationCity,
       required this.installationState,
       required this.installationZipCode,
-      required this.applicationState});
+      required this.applicationState,
+      required this.installationDate});
 
   // Método para convertir un objeto SaleData a un mapa, útil para operaciones de base de datos
   Map<String, dynamic> toMap() {
@@ -119,6 +121,7 @@ class SaleData {
       'installationCity': installationCity,
       'installationState': installationState,
       'installationZipCode': installationZipCode,
+      'installationDate': installationDate
     };
   }
 
@@ -164,6 +167,7 @@ class SaleData {
       installationState: map['installationState'] ?? '',
       installationZipCode: map['installationZipCode'] ?? '',
       applicationState: map['applicationState'] ?? '',
+      installationDate: map['installationDate'] ?? '',
     );
   }
 
@@ -216,6 +220,7 @@ class SaleData {
       installationState: data['installationState'] ?? '',
       installationZipCode: data['installationZipCode'] ?? '',
       applicationState: data['applicationState'] ?? '',
+      installationDate: data['installationDate'] ?? '',
     );
   }
 }
