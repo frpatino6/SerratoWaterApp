@@ -132,7 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const Padding(
           padding: EdgeInsets.only(left: 8.0, bottom: 8.0),
           child: Text(
-            'License of Transit',
+            'ID Number (Driver License)',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,

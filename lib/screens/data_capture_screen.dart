@@ -823,7 +823,6 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
       _addressController,
       _stateController,
       _cityZipCodeController,
-      _installationAddressDifferentController,
       _expirationDateController,
       _cityController,
       _monthlyMortgagePaymentController,
@@ -836,16 +835,10 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
       _sourceOfOtherIncomeController,
       _forIDPurposesController,
       _creditCardExpirationDateController,
-      _userController,
       _timeAtResidenceController,
-      _bankNameController,
-      _accountHolderController,
-      _routingNumberController,
-      _accountNumberController,
-      
     ];
 
-     List<TextEditingController> controllersCoApplication = [
+    List<TextEditingController> controllersCoApplication = [
       _coApplicationFirsNameController,
       _coApplicationLastNameController,
       _coApplicationPhoneNumberController,
@@ -880,14 +873,16 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
       }
     }
 
-    for (TextEditingController controller in allControllers) {
+    for (TextEditingController controller in controllersCoApplication) {
       if (controller.text.isEmpty) {
-        emptyApplicantControllers.add(controller);
+        emptyCoApplicantControllers.add(controller);
       }
     }
 
     // Retorna la lista de controladores vacíos
-    return emptyApplicantControllers;
+    if (!isCoapplicant) return emptyApplicantControllers;
+
+    return emptyApplicantControllers + emptyCoApplicantControllers;
   }
 
   void _submitForm() {
@@ -1043,48 +1038,51 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                 );
 
                 _coApplicationFirsNameController.text =
-                    coApplicantData['firstName'];
+                    coApplicantData['firstName'] ?? '';
                 _coApplicationLastNameController.text =
-                    coApplicantData['lastName'];
+                    coApplicantData['lastName'] ?? '';
                 _coApplicationPhoneNumberController.text =
-                    coApplicantData['phoneNumber'];
-                _coApplicationEmailController.text = coApplicantData['email'];
+                    coApplicantData['phoneNumber'] ?? '';
+                _coApplicationEmailController.text =
+                    coApplicantData['email'] ?? '';
                 _coApplicationSSNController.text =
-                    coApplicantData['socialSecurityNumber'];
+                    coApplicantData['socialSecurityNumber'] ?? '';
                 _coApplicationIDNumberController.text =
-                    coApplicantData['idNumberDriverLicense'];
+                    coApplicantData['idNumberDriverLicense'] ?? '';
                 _coApplicationExpirationDateController.text =
-                    coApplicantData['expirationDate'];
+                    coApplicantData['expirationDate'] ?? '';
                 _coApplicationResidenceDurationController.text =
-                    coApplicantData['timeAtResidence'];
+                    coApplicantData['timeAtResidence'] ?? '';
                 _coApplicationAddressController.text =
-                    coApplicantData['address'];
-                _coApplicationCityController.text = coApplicantData['city'];
-                _coApplicationStateController.text = coApplicantData['state'];
+                    coApplicantData['address'] ?? '';
+                _coApplicationCityController.text =
+                    coApplicantData['city'] ?? '';
+                _coApplicationStateController.text =
+                    coApplicantData['state'] ?? '';
                 _coApplicationZipCodeController.text =
-                    coApplicantData['zipCode'];
+                    coApplicantData['zipCode'] ?? '';
                 _coApplicationMortgagePaymentController.text =
-                    coApplicantData['monthlyMortgagePayment'];
+                    coApplicantData['monthlyMortgagePayment'] ?? '';
                 _coApplicationEmployerNameController.text =
-                    coApplicantData['employerName'];
+                    coApplicantData['employerName'] ?? '';
                 _coApplicationEmployerPhoneNumberController.text =
-                    coApplicantData['employerPhoneNumber'];
+                    coApplicantData['employerPhoneNumber'] ?? '';
                 _coApplicationOccupationController.text =
-                    coApplicantData['occupation'];
+                    coApplicantData['occupation'] ?? '';
                 _coApplicationJobDurationController.text =
-                    coApplicantData['timeAtCurrentJob'];
+                    coApplicantData['timeAtCurrentJob'] ?? '';
                 _coApplicationMonthlyIncomeController.text =
-                    coApplicantData['employmentMonthlyIncome'];
+                    coApplicantData['employmentMonthlyIncome'] ?? '';
                 _coApplicationOtherIncomeController.text =
-                    coApplicantData['otherIncome'];
+                    coApplicantData['otherIncome'] ?? '';
                 _coApplicationOtherIncomeSourceController.text =
-                    coApplicantData['sourceOfOtherIncome'];
+                    coApplicantData['sourceOfOtherIncome'] ?? '';
                 _coApplicationIDPurposeController.text =
-                    coApplicantData['forIDPurposes'];
+                    coApplicantData['forIDPurposes'] ?? '';
                 _coApplicationCreditCardExpirationController.text =
-                    coApplicantData['creditCardExpirationDate'];
+                    coApplicantData['creditCardExpirationDate'] ?? '';
                 _isCoApplicantAdded = true;
-
+                _validateAndSubmitForm();
                 // Aquí manejas los datos retornados, si los hay
               },
             ),
@@ -1131,37 +1129,37 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   }
 
   void initializeDefaultValues() {
-    // _saleAmountController.text = "1000";
-    // _productsSoldController.text = "5";
-    // _applicantFirstNameController.text = "Juan";
-    // _applicantLastNameController.text = "Pérez";
-    // _phoneNumberController.text = "1234567890";
-    // _dateOfBirthController.text = "01/01/1990";
-    // _idIssueDateController.text = "01/01/2015";
-    // _emailController.text = "juan.perez@example.com";
-    // _socialSecurityNumberController.text = "123-45-6789";
-    // _idNumberDriverLicenseController.text = "D12345678";
-    // _addressController.text = "123 Calle Principal";
-    // _stateController.text = "Estado";
-    // _cityZipCodeController.text = "Ciudad, 12345";
-    // _installationAddressDifferentController.text = "No";
-    // _expirationDateController.text = "01/01/2025";
-    // _cityController.text = "Ciudad";
-    // _monthlyMortgagePaymentController.text = "500";
-    // _employerNameController.text = "Empresa X";
-    // _employerPhoneNumberController.text = "0987654321";
-    // _occupationController.text = "Profesional";
-    // _timeAtCurrentJobController.text = "2 años";
-    // _employmentMonthlyIncomeController.text = "3000";
-    // _otherIncomeController.text = "500";
-    // _sourceOfOtherIncomeController.text = "Inversiones";
-    // _forIDPurposesController.text = "Sí";
-    // _creditCardExpirationDateController.text = "01/01/2024";
-    // _userController.text = "usuario123";
-    // _timeAtResidenceController.text = "3";
-    // _bankNameController.text = "Banco X";
-    // _accountHolderController.text = "Juan Pérez";
-    // _routingNumberController.text = "123456789";
-    // _accountNumberController.text = "987654321";
+    _saleAmountController.text = "1000";
+    _productsSoldController.text = "5";
+    _applicantFirstNameController.text = "Juan";
+    _applicantLastNameController.text = "Pérez";
+    _phoneNumberController.text = "1234567890";
+    _dateOfBirthController.text = "01/01/1990";
+    _idIssueDateController.text = "01/01/2015";
+    _emailController.text = "juan.perez@example.com";
+    _socialSecurityNumberController.text = "123-45-6789";
+    _idNumberDriverLicenseController.text = "D12345678";
+    _addressController.text = "123 Calle Principal";
+    _stateController.text = "Estado";
+    _cityZipCodeController.text = "Ciudad, 12345";
+    _installationAddressDifferentController.text = "No";
+    _expirationDateController.text = "01/01/2025";
+    _cityController.text = "Ciudad";
+    _monthlyMortgagePaymentController.text = "500";
+    _employerNameController.text = "Empresa X";
+    _employerPhoneNumberController.text = "0987654321";
+    _occupationController.text = "Profesional";
+    _timeAtCurrentJobController.text = "2 años";
+    _employmentMonthlyIncomeController.text = "3000";
+    _otherIncomeController.text = "500";
+    _sourceOfOtherIncomeController.text = "Inversiones";
+    _forIDPurposesController.text = "Sí";
+    _creditCardExpirationDateController.text = "01/01/2024";
+    _userController.text = "usuario123";
+    _timeAtResidenceController.text = "3";
+    _bankNameController.text = "Banco X";
+    _accountHolderController.text = "Juan Pérez";
+    _routingNumberController.text = "123456789";
+    _accountNumberController.text = "987654321";
   }
 }

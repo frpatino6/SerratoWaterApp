@@ -39,26 +39,28 @@ class DashboardScreen extends StatelessWidget {
       ),
       body: Column(
         children: <Widget>[
-          Expanded(
-            flex:
-                1, // El flex determina la proporción de espacio que cada botón debe ocupar
-            child: InkWell(
-              onTap: () => _showFinancingQuestion(context),
-              child: const Card(
-                margin: EdgeInsets.all(8.0),
-                color: Colors.blueAccent,
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Icon(Icons.add, size: 50.0),
-                      Text('Add New Customer', style: TextStyle(fontSize: 20)),
-                    ],
+          if (userType != 'Installer')
+            Expanded(
+              flex:
+                  1, // El flex determina la proporción de espacio que cada botón debe ocupar
+              child: InkWell(
+                onTap: () => _showFinancingQuestion(context),
+                child: const Card(
+                  margin: EdgeInsets.all(8.0),
+                  color: Colors.blueAccent,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(Icons.add, size: 50.0),
+                        Text('Add New Customer',
+                            style: TextStyle(fontSize: 20)),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
           Expanded(
             flex: 1,
             child: InkWell(

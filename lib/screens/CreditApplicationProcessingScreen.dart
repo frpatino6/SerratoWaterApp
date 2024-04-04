@@ -147,52 +147,50 @@ class _CreditApplicationProcessingScreenState
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _isUploading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Address:', style: headingStyle),
                     Text(widget.saleData.address, style: contentStyle),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text('Applicant Name:', style: headingStyle),
                     Text(widget.saleData.applicantName, style: contentStyle),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text('State:', style: headingStyle),
                     Text(widget.saleData.applicationState, style: contentStyle),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     GridView.builder(
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
                       ),
                       itemCount: _images.length,
                       itemBuilder: (context, index) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10),
+                        return InkWell(
+                          onTap: () => _isEditable ? _pickImage(index) : null,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: _images[index] != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: _images[index] is File
+                                        ? Image.file(_images[index],
+                                            fit: BoxFit.cover)
+                                        : Image.network(_images[index],
+                                            fit: BoxFit.cover),
+                                  )
+                                : const Icon(Icons.add_a_photo,
+                                    color: Colors.grey),
                           ),
-                          child: _images[index] != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: _images[index] is File
-                                      ? Image.file(
-                                          _images[index],
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Image.network(
-                                          _images[index],
-                                          fit: BoxFit.cover,
-                                        ),
-                                )
-                              : Icon(
-                                  Icons.add_a_photo,
-                                  color: Colors.grey[400],
-                                ),
                         );
                       },
                     ),
