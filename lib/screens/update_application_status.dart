@@ -209,14 +209,22 @@ class _UpdateApplicationStatusState extends State<UpdateApplicationStatus> {
     );
   }
 
-  void _processCreditApplication() {
-    Navigator.of(context).push(
+  Future<void> _processCreditApplication() async {
+    final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => CreditApplicationProcessingScreen(
           saleData: widget.saleData,
         ),
       ),
     );
+    if (result != null) {
+      setState(() {
+        // Actualiza el estado de la aplicación con el resultado.
+        widget.saleData.applicationState = result as String;
+        // Actualiza el valor del dropdown para reflejar el nuevo estado.
+        dropdownValue = widget.saleData.applicationState;
+      });
+    }
   }
 
   void _showInstallationDialog(BuildContext context) {

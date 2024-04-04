@@ -23,14 +23,17 @@ class _CreditApplicationProcessingScreenState
   List<dynamic> _images = [null, null, null];
   bool _isUploading = false;
   bool _isEditable = true;
+  bool _isLoadingImages = true;
 
   @override
   void initState() {
     super.initState();
-    _isEditable = widget.saleData.applicationState != "Installed";
+    _isEditable = widget.saleData.applicationState == "Pending Installation";
 
     if (!_isEditable) {
       _loadUploadedImages();
+    } else {
+      _isLoadingImages = false; // No estás cargando imágenes si es editable.
     }
   }
 
@@ -47,14 +50,35 @@ class _CreditApplicationProcessingScreenState
   }
 
   Future<void> _loadUploadedImages() async {
+    int loadedImages = 0;
     for (var i = 0; i < _images.length; i++) {
       String filePath = 'credit_applications/${widget.saleData.id}/$i.jpg';
       final ref = FirebaseStorage.instance.ref(filePath);
       ref.getDownloadURL().then((url) {
         setState(() {
           _images[i] = url;
+          loadedImages++;
+          // Verifica si todas las imágenes se han cargado o no se encontraron.
+          if (loadedImages == _images.length) {
+            _isLoadingImages = false;
+          }
         });
-      }).catchError((e) {});
+      }).catchError((e) {
+        loadedImages++;
+        // Asume que si hay un error, la imagen simplemente no está disponible.
+        if (loadedImages == _images.length) {
+          setState(() {
+            _isLoadingImages = false;
+          });
+        }
+      });
+    }
+
+    // Si no hay imágenes para cargar, asegúrate de desactivar el indicador de carga.
+    if (_images.every((image) => image == null)) {
+      setState(() {
+        _isLoadingImages = false;
+      });
     }
   }
 
@@ -113,11 +137,16 @@ class _CreditApplicationProcessingScreenState
     setState(() {
       _isUploading = false;
     });
+
+    if (uploadSuccess) {
+      Navigator.pop(context, widget.saleData.applicationState);
+    }
   }
 
   void _updateApplicationState() {
     final salesBloc = BlocProvider.of<SalesBloc>(context);
     salesBloc.add(UpdateSalesStatusEvent(widget.saleData.id, "Installed"));
+    widget.saleData.applicationState = "Installed";
   }
 
   @override
@@ -144,60 +173,66 @@ class _CreditApplicationProcessingScreenState
               ]
             : [],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: _isUploading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Address:', style: headingStyle),
-                    Text(widget.saleData.address, style: contentStyle),
-                    const SizedBox(height: 10),
-                    Text('Applicant Name:', style: headingStyle),
-                    Text(widget.saleData.applicantName, style: contentStyle),
-                    const SizedBox(height: 10),
-                    Text('State:', style: headingStyle),
-                    Text(widget.saleData.applicationState, style: contentStyle),
-                    const SizedBox(height: 20),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                      ),
-                      itemCount: _images.length,
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: () => _isEditable ? _pickImage(index) : null,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              borderRadius: BorderRadius.circular(10),
+      body: _isLoadingImages
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: _isUploading
+                  ? const Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Address:', style: headingStyle),
+                          Text(widget.saleData.address, style: contentStyle),
+                          const SizedBox(height: 10),
+                          Text('Applicant Name:', style: headingStyle),
+                          Text(widget.saleData.applicantName,
+                              style: contentStyle),
+                          const SizedBox(height: 10),
+                          Text('State:', style: headingStyle),
+                          Text(widget.saleData.applicationState,
+                              style: contentStyle),
+                          const SizedBox(height: 20),
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
                             ),
-                            child: _images[index] != null
-                                ? ClipRRect(
+                            itemCount: _images.length,
+                            itemBuilder: (context, index) {
+                              return InkWell(
+                                onTap: () =>
+                                    _isEditable ? _pickImage(index) : null,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200],
                                     borderRadius: BorderRadius.circular(10),
-                                    child: _images[index] is File
-                                        ? Image.file(_images[index],
-                                            fit: BoxFit.cover)
-                                        : Image.network(_images[index],
-                                            fit: BoxFit.cover),
-                                  )
-                                : const Icon(Icons.add_a_photo,
-                                    color: Colors.grey),
+                                  ),
+                                  child: _images[index] != null
+                                      ? ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: _images[index] is File
+                                              ? Image.file(_images[index],
+                                                  fit: BoxFit.cover)
+                                              : Image.network(_images[index],
+                                                  fit: BoxFit.cover),
+                                        )
+                                      : const Icon(Icons.add_a_photo,
+                                          color: Colors.grey),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
-      ),
+            ),
     );
   }
 }
