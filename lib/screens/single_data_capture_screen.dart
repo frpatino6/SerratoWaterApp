@@ -23,7 +23,62 @@ class _SingleDataCaptureScreenState extends State<SingleDataCaptureScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  String? city;
+  String? selectedState = "";
+  String? zipCode;
 
+  final List<String> _statesList = [
+    "Alabama",
+    "Alaska",
+    "Arizona",
+    "Arkansas",
+    "California",
+    "Colorado",
+    "Connecticut",
+    "Delaware",
+    "Florida",
+    "Georgia",
+    "Hawaii",
+    "Idaho",
+    "Illinois",
+    "Indiana",
+    "Iowa",
+    "Kansas",
+    "Kentucky",
+    "Louisiana",
+    "Maine",
+    "Maryland",
+    "Massachusetts",
+    "Michigan",
+    "Minnesota",
+    "Mississippi",
+    "Missouri",
+    "Montana",
+    "Nebraska",
+    "Nevada",
+    "New Hampshire",
+    "New Jersey",
+    "New Mexico",
+    "New York",
+    "North Carolina",
+    "North Dakota",
+    "Ohio",
+    "Oklahoma",
+    "Oregon",
+    "Pennsylvania",
+    "Rhode Island",
+    "South Carolina",
+    "South Dakota",
+    "Tennessee",
+    "Texas",
+    "Utah",
+    "Vermont",
+    "Virginia",
+    "Washington",
+    "West Virginia",
+    "Wisconsin",
+    "Wyoming"
+  ];
   List<String> _selectedProducts = [];
 
   @override
@@ -173,6 +228,41 @@ class _SingleDataCaptureScreenState extends State<SingleDataCaptureScreen> {
                         : null,
                   ),
                   TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'City',
+                    ),
+                    onSaved: (value) {
+                      city = value;
+                    },
+                  ),
+                  DropdownButtonFormField(
+                    decoration: const InputDecoration(labelText: 'State'),
+                    value: selectedState!.isEmpty
+                        ? null
+                        : selectedState, // Asigna el valor aquí
+                    items: _statesList.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectedState = newValue.toString();
+                      });
+                    },
+                    onSaved: (value) => selectedState = value!,
+                  ),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Zip Code',
+                    ),
+                    onSaved: (value) {
+                      zipCode = value;
+                    },
+                  ),
+                  TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(labelText: 'Email'),
                     keyboardType: TextInputType.emailAddress,
@@ -213,7 +303,7 @@ class _SingleDataCaptureScreenState extends State<SingleDataCaptureScreen> {
         "idNumberDriverLicense": "",
         "idIssueDate": DateTime(0).toIso8601String(),
         "expirationDate": DateTime(0).toIso8601String(),
-        "cityZipCode": "",
+        "cityZipCode": zipCode,
         "installationAddressDifferent": false,
         "monthlyMortgagePayment": "",
         "employerName": "",
@@ -235,8 +325,8 @@ class _SingleDataCaptureScreenState extends State<SingleDataCaptureScreen> {
         "accountHolder": "",
         "routingNumber": "",
         "accountNumber": "",
-        "city": "",
-        "state": "",
+        "city": city,
+        "state": selectedState,
         "applicationState": "Submitted",
         "creditCardExpirationDate": "",
         "timeAtResidence": 0,

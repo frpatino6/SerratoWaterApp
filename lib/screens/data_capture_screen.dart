@@ -187,6 +187,8 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   final String _sourceOfOtherIncome = '';
   final String _forIDPurposes = '';
 
+  bool isCoapplicant = false;
+
   bool _isACHInfoAdded = false;
   bool _isIncomeNoticeChecked = false;
   bool _isCoApplicantAdded = false;
@@ -288,6 +290,11 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
     "AMERICAN EXPRESS",
     "DISCOVER",
   ];
+  @override
+  void initState() {
+    super.initState();
+    initializeDefaultValues(); // Llama aquí al método
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -379,6 +386,8 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                               setState(() {
                                 _selectedProducts = selectedProducts;
                                 _saleAmountController.text = cost;
+                                _productsSoldController.text =
+                                    selectedProducts.join(', ');
                               });
                             },
                           );
@@ -798,9 +807,9 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
     setState(() {});
   }
 
-  bool _areAllFieldsFilled() {
+  List<TextEditingController> _findEmptyFields() {
     // Lista de todos los TextEditingController
-    List<TextEditingController> controllers = [
+    List<TextEditingController> allControllers = [
       _saleAmountController,
       _productsSoldController,
       _applicantFirstNameController,
@@ -833,6 +842,10 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
       _accountHolderController,
       _routingNumberController,
       _accountNumberController,
+      
+    ];
+
+     List<TextEditingController> controllersCoApplication = [
       _coApplicationFirsNameController,
       _coApplicationLastNameController,
       _coApplicationPhoneNumberController,
@@ -856,9 +869,25 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
       _coApplicationIDPurposeController,
       _coApplicationCreditCardExpirationController,
     ];
+    // Lista para guardar los controladores que estén vacíos
+    List<TextEditingController> emptyApplicantControllers = [];
+    List<TextEditingController> emptyCoApplicantControllers = [];
 
-    // Verifica si algún controlador está vacío
-    return controllers.every((controller) => controller.text.isNotEmpty);
+    // Itera sobre los controladores y añade a la lista los que estén vacíos
+    for (TextEditingController controller in allControllers) {
+      if (controller.text.isEmpty) {
+        emptyApplicantControllers.add(controller);
+      }
+    }
+
+    for (TextEditingController controller in allControllers) {
+      if (controller.text.isEmpty) {
+        emptyApplicantControllers.add(controller);
+      }
+    }
+
+    // Retorna la lista de controladores vacíos
+    return emptyApplicantControllers;
   }
 
   void _submitForm() {
@@ -962,7 +991,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   }
 
   void _validateAndSubmitForm() {
-    if (_formKey.currentState!.validate() && _areAllFieldsFilled()) {
+    if (_formKey.currentState!.validate() && _findEmptyFields().isEmpty) {
       _formKey.currentState!.save();
       _submitForm();
     } else {
@@ -997,6 +1026,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
             TextButton(
               child: const Text("No"),
               onPressed: () {
+                isCoapplicant = false;
                 Navigator.of(context).pop();
                 _validateAndSubmitForm();
               },
@@ -1004,6 +1034,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
             TextButton(
               child: const Text("Yes"),
               onPressed: () async {
+                isCoapplicant = true;
                 Navigator.of(context).pop();
                 final coApplicantData = await Navigator.push(
                   context,
@@ -1097,5 +1128,40 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
       _isIncomeNoticeChecked = false;
       _isCoApplicantAdded = false;
     });
+  }
+
+  void initializeDefaultValues() {
+    // _saleAmountController.text = "1000";
+    // _productsSoldController.text = "5";
+    // _applicantFirstNameController.text = "Juan";
+    // _applicantLastNameController.text = "Pérez";
+    // _phoneNumberController.text = "1234567890";
+    // _dateOfBirthController.text = "01/01/1990";
+    // _idIssueDateController.text = "01/01/2015";
+    // _emailController.text = "juan.perez@example.com";
+    // _socialSecurityNumberController.text = "123-45-6789";
+    // _idNumberDriverLicenseController.text = "D12345678";
+    // _addressController.text = "123 Calle Principal";
+    // _stateController.text = "Estado";
+    // _cityZipCodeController.text = "Ciudad, 12345";
+    // _installationAddressDifferentController.text = "No";
+    // _expirationDateController.text = "01/01/2025";
+    // _cityController.text = "Ciudad";
+    // _monthlyMortgagePaymentController.text = "500";
+    // _employerNameController.text = "Empresa X";
+    // _employerPhoneNumberController.text = "0987654321";
+    // _occupationController.text = "Profesional";
+    // _timeAtCurrentJobController.text = "2 años";
+    // _employmentMonthlyIncomeController.text = "3000";
+    // _otherIncomeController.text = "500";
+    // _sourceOfOtherIncomeController.text = "Inversiones";
+    // _forIDPurposesController.text = "Sí";
+    // _creditCardExpirationDateController.text = "01/01/2024";
+    // _userController.text = "usuario123";
+    // _timeAtResidenceController.text = "3";
+    // _bankNameController.text = "Banco X";
+    // _accountHolderController.text = "Juan Pérez";
+    // _routingNumberController.text = "123456789";
+    // _accountNumberController.text = "987654321";
   }
 }
