@@ -1,0 +1,9 @@
+{
+  "rules": {
+    ".read": true,  // 2023-9-28
+    ".write": true,  // 2023-9-28
+     "user_extend_info": {
+      ".indexOn": ["email"]
+    } 
+  }
+}
