@@ -1,4 +1,5 @@
-import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -33,7 +34,7 @@ class _CreditApplicationProcessingScreenState
     if (!_isEditable) {
       _loadUploadedImages();
     } else {
-      _isLoadingImages = false; // No estás cargando imágenes si es editable.
+      _isLoadingImages = false;
     }
   }
 
@@ -44,7 +45,7 @@ class _CreditApplicationProcessingScreenState
 
     if (image != null) {
       setState(() {
-        _images[index] = File(image.path);
+        _images[index] = image;
       });
     }
   }
@@ -58,14 +59,12 @@ class _CreditApplicationProcessingScreenState
         setState(() {
           _images[i] = url;
           loadedImages++;
-          // Verifica si todas las imágenes se han cargado o no se encontraron.
           if (loadedImages == _images.length) {
             _isLoadingImages = false;
           }
         });
       }).catchError((e) {
         loadedImages++;
-        // Asume que si hay un error, la imagen simplemente no está disponible.
         if (loadedImages == _images.length) {
           setState(() {
             _isLoadingImages = false;
@@ -74,7 +73,6 @@ class _CreditApplicationProcessingScreenState
       });
     }
 
-    // Si no hay imágenes para cargar, asegúrate de desactivar el indicador de carga.
     if (_images.every((image) => image == null)) {
       setState(() {
         _isLoadingImages = false;
@@ -103,11 +101,11 @@ class _CreditApplicationProcessingScreenState
     );
 
     if (shouldUpload == true) {
-      _uploadImagesAndUpdatState();
+      _uploadImagesAndUpdateState();
     }
   }
 
-  Future<void> _uploadImagesAndUpdatState() async {
+  Future<void> _uploadImagesAndUpdateState() async {
     if (!_isEditable) return;
     setState(() {
       _isUploading = true;
@@ -116,9 +114,10 @@ class _CreditApplicationProcessingScreenState
     bool uploadSuccess = true;
     try {
       for (var i = 0; i < _images.length; i++) {
-        if (_images[i] != null && _images[i] is File) {
+        if (_images[i] != null && _images[i] is XFile) {
           String filePath = 'credit_applications/${widget.saleData.id}/$i.jpg';
-          await FirebaseStorage.instance.ref(filePath).putFile(_images[i]);
+          var fileBytes = await (_images[i] as XFile).readAsBytes();
+          await FirebaseStorage.instance.ref(filePath).putData(fileBytes);
         }
       }
     } catch (e) {
@@ -217,9 +216,32 @@ class _CreditApplicationProcessingScreenState
                                       ? ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(10),
-                                          child: _images[index] is File
-                                              ? Image.file(_images[index],
-                                                  fit: BoxFit.cover)
+                                          child: _images[index] is XFile
+                                              ? FutureBuilder<Uint8List>(
+                                                  future:
+                                                      (_images[index] as XFile)
+                                                          .readAsBytes(),
+                                                  builder: (BuildContext
+                                                          context,
+                                                      AsyncSnapshot<Uint8List>
+                                                          snapshot) {
+                                                    if (snapshot.connectionState ==
+                                                            ConnectionState
+                                                                .done &&
+                                                        snapshot.data != null) {
+                                                      return Image.memory(
+                                                          snapshot.data!,
+                                                          fit: BoxFit.cover);
+                                                    } else if (snapshot.error !=
+                                                        null) {
+                                                      return const Icon(
+                                                          Icons.error,
+                                                          color: Colors.red);
+                                                    } else {
+                                                      return const CircularProgressIndicator();
+                                                    }
+                                                  },
+                                                )
                                               : Image.network(_images[index],
                                                   fit: BoxFit.cover),
                                         )
