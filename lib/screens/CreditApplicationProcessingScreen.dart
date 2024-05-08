@@ -162,7 +162,7 @@ class _CreditApplicationProcessingScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Process Credit Application'),
+        title: const Text('Installation Evidence Capture'),
         actions: _isEditable
             ? [
                 IconButton(
@@ -193,63 +193,90 @@ class _CreditApplicationProcessingScreenState
                           Text(widget.saleData.applicationState,
                               style: contentStyle),
                           const SizedBox(height: 20),
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                            ),
-                            itemCount: _images.length,
-                            itemBuilder: (context, index) {
-                              return InkWell(
-                                onTap: () =>
-                                    _isEditable ? _pickImage(index) : null,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: _images[index] != null
-                                      ? ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          child: _images[index] is XFile
-                                              ? FutureBuilder<Uint8List>(
-                                                  future:
-                                                      (_images[index] as XFile)
-                                                          .readAsBytes(),
-                                                  builder: (BuildContext
-                                                          context,
-                                                      AsyncSnapshot<Uint8List>
-                                                          snapshot) {
-                                                    if (snapshot.connectionState ==
-                                                            ConnectionState
-                                                                .done &&
-                                                        snapshot.data != null) {
-                                                      return Image.memory(
-                                                          snapshot.data!,
-                                                          fit: BoxFit.cover);
-                                                    } else if (snapshot.error !=
-                                                        null) {
-                                                      return const Icon(
-                                                          Icons.error,
-                                                          color: Colors.red);
-                                                    } else {
-                                                      return const CircularProgressIndicator();
-                                                    }
-                                                  },
+                          // Added Card widget to frame the photos
+                          Card(
+                            elevation: 4,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Photos',
+                                      style:
+                                          headingStyle), // Title for the photos section
+                                  GridView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 10,
+                                    ),
+                                    itemCount: _images.length,
+                                    itemBuilder: (context, index) {
+                                      return InkWell(
+                                        onTap: () => _isEditable
+                                            ? _pickImage(index)
+                                            : null,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: _images[index] != null
+                                              ? ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child: _images[index] is XFile
+                                                      ? FutureBuilder<
+                                                          Uint8List>(
+                                                          future: (_images[
+                                                                      index]
+                                                                  as XFile)
+                                                              .readAsBytes(),
+                                                          builder: (BuildContext
+                                                                  context,
+                                                              AsyncSnapshot<
+                                                                      Uint8List>
+                                                                  snapshot) {
+                                                            if (snapshot.connectionState ==
+                                                                    ConnectionState
+                                                                        .done &&
+                                                                snapshot.data !=
+                                                                    null) {
+                                                              return Image.memory(
+                                                                  snapshot
+                                                                      .data!,
+                                                                  fit: BoxFit
+                                                                      .cover);
+                                                            } else if (snapshot
+                                                                    .error !=
+                                                                null) {
+                                                              return const Icon(
+                                                                  Icons.error,
+                                                                  color: Colors
+                                                                      .red);
+                                                            } else {
+                                                              return const CircularProgressIndicator();
+                                                            }
+                                                          },
+                                                        )
+                                                      : Image.network(
+                                                          _images[index],
+                                                          fit: BoxFit.cover),
                                                 )
-                                              : Image.network(_images[index],
-                                                  fit: BoxFit.cover),
-                                        )
-                                      : const Icon(Icons.add_a_photo,
-                                          color: Colors.grey),
-                                ),
-                              );
-                            },
+                                              : const Icon(Icons.add_a_photo,
+                                                  color: Colors.grey),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),

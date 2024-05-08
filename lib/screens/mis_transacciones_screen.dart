@@ -9,8 +9,12 @@ import 'package:serrato_water_app/screens/update_application_status.dart';
 class MisTransaccionesScreen extends StatefulWidget {
   final String userType;
   final String userName;
-  const MisTransaccionesScreen(
-      {super.key, required this.userType, required this.userName});
+
+  const MisTransaccionesScreen({
+    super.key,
+    required this.userType,
+    required this.userName,
+  });
 
   @override
   State<MisTransaccionesScreen> createState() => _MisTransaccionesScreenState();
@@ -35,8 +39,10 @@ class _MisTransaccionesScreenState extends State<MisTransaccionesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sales List',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          widget.userType == 'Installer' ? 'Work Orders' : 'Sales List',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -68,9 +74,11 @@ class _MisTransaccionesScreenState extends State<MisTransaccionesScreen> {
             );
           }
           return const Center(
-              child: Text('Please tap button to load data',
-                  style:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0)));
+            child: Text(
+              'Please tap button to load data',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+            ),
+          );
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -85,8 +93,11 @@ class CustomListItem extends StatelessWidget {
   final SaleData saleData;
   final String userType;
 
-  const CustomListItem(
-      {super.key, required this.saleData, required this.userType});
+  const CustomListItem({
+    super.key,
+    required this.saleData,
+    required this.userType,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -103,16 +114,19 @@ class CustomListItem extends StatelessWidget {
         text: TextSpan(
           children: [
             const TextSpan(
-                text: 'Customer name: ',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+              text: 'Customer name: ',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             TextSpan(text: '${saleData.applicantName}\n'),
             const TextSpan(
-                text: 'Address: ',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+              text: 'Address: ',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             TextSpan(text: '${saleData.address}\n'),
             const TextSpan(
-                text: 'Status: ',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+              text: 'Status: ',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             TextSpan(text: '${saleData.applicationState}\n'),
           ],
           style: const TextStyle(color: Colors.black54),

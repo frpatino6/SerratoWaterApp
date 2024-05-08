@@ -92,7 +92,7 @@ class _UpdateApplicationStatusState extends State<UpdateApplicationStatus> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Application Details'),
+            title: const Text('Installation Details'),
             actions: [
               if (widget.currentUserType == 'SuperAdministrator' ||
                   widget.currentUserType == 'Administrator')
