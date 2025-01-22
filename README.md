@@ -1,6 +1,6 @@
-# test_app
+# serrato_water_app
 
-A new Flutter project.
+Credit application Serrato water.
 
 ## Getting Started
 
